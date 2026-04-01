@@ -2,8 +2,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createKnowledgeSubmissionAction } from "@/app/knowledge/contribute/actions";
+import { FormPendingOverlay } from "@/components/ui/form-pending-overlay";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { Textarea } from "@/components/ui/textarea";
 import { getCurrentViewer } from "@/lib/auth/viewer";
 import { listKnowledgeSubmissionsForViewer } from "@/lib/repositories/knowledge-submissions";
@@ -15,8 +17,8 @@ import type {
 const categoryLabelMap: Record<KnowledgeTrack, string> = {
   basics: "기초",
   "level-up": "레벨업",
-  tips: "꿀팁",
-  external: "외부지식창고",
+  tips: "팁 모음",
+  external: "외부 자료",
 };
 
 const statusLabelMap: Record<KnowledgeSubmissionStatus, string> = {
@@ -58,14 +60,14 @@ export default async function KnowledgeContributePage({
           좋은 지식을 제보해 주세요
         </h1>
         <p className="max-w-3xl text-base leading-8 text-muted-foreground">
-          새로운 가이드, 유용한 링크, 실제로 도움이 되었던 팁을 보내주시면 관리자가 검토 후 지식
-          베이스에 반영합니다.
+          새로운 가이드, 유용한 링크, 실제로 도움이 되었던 정보를 보내주시면 관리자가
+          검토해서 지식베이스에 반영합니다.
         </p>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="glass-panel rounded-[2rem] border border-[rgba(121,118,127,0.08)] px-6 py-6">
-          <form action={createKnowledgeSubmissionAction} className="space-y-5">
+          <form action={createKnowledgeSubmissionAction} className="relative space-y-5">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <label htmlFor="category" className="text-sm font-semibold text-foreground">
@@ -79,8 +81,8 @@ export default async function KnowledgeContributePage({
                 >
                   <option value="basics">기초</option>
                   <option value="level-up">레벨업</option>
-                  <option value="tips">꿀팁</option>
-                  <option value="external">외부지식창고</option>
+                  <option value="tips">팁 모음</option>
+                  <option value="external">외부 자료</option>
                 </select>
               </div>
 
@@ -96,7 +98,12 @@ export default async function KnowledgeContributePage({
               <label htmlFor="title" className="text-sm font-semibold text-foreground">
                 제목
               </label>
-              <Input id="title" name="title" placeholder="예: Claude Code 설치 체크리스트" required />
+              <Input
+                id="title"
+                name="title"
+                placeholder="예: Claude Code 설치 체크리스트"
+                required
+              />
             </div>
 
             <div className="space-y-2">
@@ -107,7 +114,7 @@ export default async function KnowledgeContributePage({
                 id="summary"
                 name="summary"
                 className="min-h-24"
-                placeholder="이 지식이 왜 도움이 되는지 짧게 적어 주세요."
+                placeholder="이 지식이 왜 유용한지 짧게 적어 주세요."
                 required
               />
             </div>
@@ -120,7 +127,7 @@ export default async function KnowledgeContributePage({
                 id="details"
                 name="details"
                 className="min-h-40"
-                placeholder="핵심 내용, 추천 이유, 어떤 사용자에게 도움이 되는지 적어 주세요."
+                placeholder="핵심 내용, 추천 이유, 누구에게 도움이 되는지 자세히 적어 주세요."
                 required
               />
             </div>
@@ -138,29 +145,36 @@ export default async function KnowledgeContributePage({
             ) : null}
 
             <div className="flex flex-wrap gap-3">
-              <Button type="submit" variant="secondary">
+              <PendingSubmitButton variant="secondary" pendingLabel="제보 전송 중...">
                 지식 제보하기
-              </Button>
+              </PendingSubmitButton>
               <Button asChild variant="outline">
                 <Link href="/knowledge/basics">지식창고로 돌아가기</Link>
               </Button>
             </div>
+
+            <FormPendingOverlay
+              label="제보를 전송하고 있어요..."
+              className="rounded-[1.75rem]"
+            />
           </form>
         </div>
 
         <div className="space-y-4">
           <div className="surface-subtle rounded-[2rem] px-6 py-6">
-            <p className="text-2xl font-bold tracking-[-0.04em] text-primary">제보 전에 확인해 주세요</p>
+            <p className="text-2xl font-bold tracking-[-0.04em] text-primary">
+              제보 전에 확인해 주세요
+            </p>
             <ul className="mt-4 space-y-3 text-sm leading-7 text-muted-foreground">
-              <li>중복 링크보다 직접 도움이 된 이유를 함께 적어 주면 검토가 훨씬 쉬워집니다.</li>
+              <li>중복 링크보다 직접 인사이트와 추천 이유를 함께 적어 주시면 검토가 더 빨라집니다.</li>
               <li>외부 자료는 공식 문서, 안정적인 가이드, 검증된 튜토리얼 위주로 추천해 주세요.</li>
-              <li>프롬프트 팁은 복사해서 바로 써볼 수 있는 예시가 있으면 더 좋습니다.</li>
+              <li>프로젝트에서 바로 써먹을 수 있는 예시가 있다면 훨씬 좋습니다.</li>
             </ul>
           </div>
 
           <div className="surface-subtle rounded-[2rem] px-6 py-6">
             <div className="flex items-center justify-between gap-4">
-              <p className="text-2xl font-bold tracking-[-0.04em] text-primary">내 제보 내역</p>
+              <p className="text-2xl font-bold tracking-[-0.04em] text-primary">내 제보 이력</p>
               <span className="text-sm text-muted-foreground">{submissions.length}건</span>
             </div>
             <div className="mt-5 space-y-3">

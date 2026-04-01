@@ -2,13 +2,14 @@
 
 import { redirect } from "next/navigation";
 
+import { normalizeNickname } from "@/lib/auth/nickname";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function saveNicknameAction(formData: FormData) {
-  const nickname = String(formData.get("nickname") ?? "").trim();
-  const next = String(formData.get("next") ?? "/profile");
+  const nickname = normalizeNickname(formData.get("nickname"));
+  const next = String(formData.get("next") ?? "/home");
 
-  if (nickname.length < 2) {
+  if (!nickname) {
     redirect(`/auth/onboarding?next=${encodeURIComponent(next)}&error=nickname`);
   }
 

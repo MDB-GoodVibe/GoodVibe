@@ -1,31 +1,44 @@
 "use client";
 
+import type { VariantProps } from "class-variance-authority";
 import { LoaderCircle, LogOut } from "lucide-react";
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
-export function SignOutButton({ className }: { className?: string }) {
+type SignOutButtonProps = {
+  className?: string;
+  label?: string;
+  redirectTo?: string;
+  variant?: VariantProps<typeof buttonVariants>["variant"];
+};
+
+export function SignOutButton({
+  className,
+  label = "로그아웃",
+  redirectTo = "/",
+  variant = "outline",
+}: SignOutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
 
     if (!supabase) {
-      window.location.href = "/";
+      window.location.href = redirectTo;
       return;
     }
 
     setIsLoading(true);
     await supabase.auth.signOut();
-    window.location.href = "/";
+    window.location.href = redirectTo;
   }
 
   return (
     <Button
       type="button"
-      variant="outline"
+      variant={variant}
       className={className}
       onClick={handleSignOut}
       disabled={isLoading}
@@ -35,7 +48,7 @@ export function SignOutButton({ className }: { className?: string }) {
       ) : (
         <LogOut className="size-4" />
       )}
-      로그아웃
+      {isLoading ? "로그아웃 중..." : label}
     </Button>
   );
 }

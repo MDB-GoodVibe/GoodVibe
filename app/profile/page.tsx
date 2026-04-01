@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
@@ -35,45 +36,29 @@ function AuthCanvas({ children }: { children: ReactNode }) {
 export default async function ProfilePage() {
   const viewer = await getCurrentViewer();
 
+  if (viewer && !viewer.nickname) {
+    redirect("/auth/onboarding?next=/home");
+  }
+
   if (!viewer) {
     return (
       <AuthCanvas>
-        <section className="w-full max-w-[500px] rounded-[2rem] border border-[rgba(121,118,127,0.08)] bg-white/94 px-7 py-8 shadow-[0_26px_70px_rgba(37,31,74,0.08)] backdrop-blur-xl">
-          <div className="space-y-2 text-center">
-            <h1 className="text-5xl font-extrabold tracking-[-0.08em] text-primary">GoodVibe</h1>
-            <p className="text-base text-muted-foreground">
-              당신만의 긍정적인 빌드 공간에 오신 것을 환영합니다.
-            </p>
-          </div>
-
-          <div className="mt-8 space-y-6">
-            <GoogleSignInButton next="/profile" />
-
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span className="h-px flex-1 bg-[rgba(121,118,127,0.12)]" />
-              또는
-              <span className="h-px flex-1 bg-[rgba(121,118,127,0.12)]" />
+        <section className="w-full max-w-[430px] rounded-[2.2rem] border border-[rgba(121,118,127,0.08)] bg-white/96 px-7 py-8 shadow-[0_30px_80px_rgba(37,31,74,0.08)] backdrop-blur-xl sm:px-9 sm:py-10">
+          <div className="space-y-8">
+            <div className="space-y-3 text-center">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.36em] text-primary/45">
+                Good Vibe
+              </p>
+              <h1 className="text-5xl font-extrabold tracking-[-0.08em] text-primary sm:text-6xl">
+                GoodVibe
+              </h1>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">닉네임 또는 이름</label>
-              <div className="rounded-2xl border border-[rgba(121,118,127,0.1)] bg-[rgba(244,243,243,0.72)] px-5 py-4 text-base text-muted-foreground">
-                로그인 후 사용할 이름을 설정할 수 있어요.
-              </div>
-            </div>
-
-            <Button
-              disabled
-              variant="secondary"
-              className="h-14 w-full rounded-2xl text-lg shadow-[0_18px_28px_rgba(176,72,72,0.18)]"
-            >
-              시작하기
-            </Button>
+            <GoogleSignInButton
+              next="/home"
+              className="h-16 rounded-[1.8rem] text-[1.15rem]"
+            />
           </div>
-
-          <p className="mt-10 text-center text-sm text-muted-foreground">
-            로그인에 문제가 있다면 Google Provider 설정과 Redirect URL을 다시 확인해 주세요.
-          </p>
         </section>
       </AuthCanvas>
     );
@@ -86,7 +71,9 @@ export default async function ProfilePage() {
           <h1 className="text-4xl font-extrabold tracking-[-0.08em] text-primary">
             {viewer.nickname ?? "GoodVibe 사용자"}
           </h1>
-          <p className="text-base text-muted-foreground">{viewer.email ?? "이메일 정보 없음"}</p>
+          <p className="text-base text-muted-foreground">
+            {viewer.email ?? "이메일 정보를 불러오지 못했어요."}
+          </p>
         </div>
 
         <div className="mt-8 space-y-4">
@@ -94,30 +81,21 @@ export default async function ProfilePage() {
             <p className="text-sm font-semibold text-foreground">현재 상태</p>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">
               {viewer.role === "admin"
-                ? "관리자 권한이 활성화되어 있어 지식 문서와 제보함을 운영할 수 있어요."
-                : "아이디어 작성, 투표, 바이브 헬퍼 저장 기능을 바로 사용할 수 있어요."}
+                ? "관리자 권한이 활성화되어 있어 지식 문서와 제안 흐름을 함께 운영할 수 있어요."
+                : "아이디어 작성, 지식 탐색, Vibe Helper 기능을 바로 사용할 수 있어요."}
             </p>
           </div>
 
-          {!viewer.nickname ? (
-            <Button asChild variant="secondary" className="h-14 w-full rounded-2xl text-lg">
-              <Link href="/auth/onboarding">
-                닉네임 설정하기
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-          ) : (
-            <Button asChild variant="secondary" className="h-14 w-full rounded-2xl text-lg">
-              <Link href="/home">
-                홈으로 이동
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-          )}
+          <Button asChild variant="secondary" className="h-14 w-full rounded-2xl text-lg">
+            <Link href="/home">
+              홈으로 이동
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <Button asChild variant="outline" className="h-12 rounded-2xl">
-              <Link href="/helper/idea">바이브 헬퍼 열기</Link>
+              <Link href="/helper/idea">Vibe Helper 열기</Link>
             </Button>
             <SignOutButton className="h-12 rounded-2xl" />
           </div>

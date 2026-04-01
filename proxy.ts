@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { normalizeNickname } from "@/lib/auth/nickname";
 import { getSupabasePublicRuntime } from "@/lib/env";
 
 export async function proxy(request: NextRequest) {
@@ -34,9 +35,55 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getUser();
+  const pathname = request.nextUrl.pathname;
+  const allowIncompleteProfile =
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/auth/callback") ||
+    pathname.startsWith("/auth/onboarding") ||
+    pathname.startsWith("/setup");
 
-  return response;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user || allowIncompleteProfile) {
+    return response;
+  }
+
+  let nickname = normalizeNickname(user.user_metadata?.nickname);
+
+  if (!nickname) {
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("nickname")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      nickname = normalizeNickname(profile?.nickname);
+    } catch {
+      nickname = null;
+    }
+  }
+
+  if (nickname) {
+    return response;
+  }
+
+  const nextPath =
+    pathname === "/" || pathname === "/profile"
+      ? "/home"
+      : `${pathname}${request.nextUrl.search}`;
+
+  const redirectResponse = NextResponse.redirect(
+    new URL(`/auth/onboarding?next=${encodeURIComponent(nextPath)}`, request.url),
+  );
+
+  response.cookies.getAll().forEach((cookie) => {
+    redirectResponse.cookies.set(cookie);
+  });
+
+  return redirectResponse;
 }
 
 export const config = {

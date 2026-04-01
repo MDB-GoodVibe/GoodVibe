@@ -10,8 +10,9 @@
     "test": "node --experimental-strip-types --import ./tests/register-alias.mjs tests/run-tests.mts",
     "db:apply:init": "tsx scripts/apply-supabase-sql.ts supabase/migrations/202603250001_good_vibe_init.sql",
     "db:apply:knowledge-expansion": "tsx scripts/apply-supabase-sql.ts supabase/migrations/202603260002_knowledge_expansion.sql",
+    "db:apply:knowledge-ai-drafts": "tsx scripts/apply-supabase-sql.ts supabase/migrations/202603270003_knowledge_ai_drafts.sql",
     "db:seed:good-vibe": "tsx scripts/seed-good-vibe.ts",
-    "db:bootstrap:good-vibe": "npm run db:apply:init && npm run db:apply:knowledge-expansion && npm run db:seed:good-vibe"
+    "db:bootstrap:good-vibe": "npm run db:apply:init && npm run db:apply:knowledge-expansion && npm run db:apply:knowledge-ai-drafts && npm run db:seed:good-vibe"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -28,6 +29,10 @@
     "next": "16.2.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-markdown": "^10.1.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {

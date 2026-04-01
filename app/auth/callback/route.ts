@@ -1,11 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { normalizeNickname } from "@/lib/auth/nickname";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
-  const next = url.searchParams.get("next") || "/profile";
+  const next = url.searchParams.get("next") || "/home";
 
   const supabase = await createSupabaseServerClient();
 
@@ -25,9 +26,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/profile", url.origin));
   }
 
-  const nickname = user.user_metadata?.nickname;
+  const nickname = normalizeNickname(user.user_metadata?.nickname);
 
-  if (typeof nickname !== "string" || !nickname.trim()) {
+  if (!nickname) {
     return NextResponse.redirect(
       new URL(`/auth/onboarding?next=${encodeURIComponent(next)}`, url.origin),
     );

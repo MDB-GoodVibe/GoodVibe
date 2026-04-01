@@ -3,9 +3,11 @@ import { redirect } from "next/navigation";
 
 import { createIdeaPostAction } from "@/app/ideas/actions";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { FormPendingOverlay } from "@/components/ui/form-pending-overlay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { Textarea } from "@/components/ui/textarea";
 import { getCurrentViewer } from "@/lib/auth/viewer";
 
@@ -33,7 +35,7 @@ export default async function NewIdeaPage({
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm leading-7 text-muted-foreground">
-                아이디어 작성은 Google 로그인 후 사용할 수 있습니다.
+                아이디어 작성은 Google 로그인 후 이용할 수 있습니다.
               </p>
               <GoogleSignInButton next="/ideas/new" />
             </CardContent>
@@ -43,11 +45,11 @@ export default async function NewIdeaPage({
             <CardHeader className="space-y-3">
               <CardTitle className="text-3xl">아이디어 등록</CardTitle>
               <p className="text-sm leading-7 text-muted-foreground">
-                제목과 내용을 적으면 다른 사용자가 보고 투표할 수 있습니다.
+                제목과 내용을 적으면 다른 사용자가 보고 공감하거나 투표할 수 있습니다.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
-              <form action={createIdeaPostAction} className="space-y-4">
+              <form action={createIdeaPostAction} className="relative space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-foreground" htmlFor="title">
                     제목
@@ -55,7 +57,7 @@ export default async function NewIdeaPage({
                   <Input
                     id="title"
                     name="title"
-                    placeholder="예: 수업 공지와 자료를 한 번에 관리하는 서비스"
+                    placeholder="예: 작업 공지와 자료를 한 번에 관리하는 보드"
                     required
                   />
                 </div>
@@ -68,23 +70,31 @@ export default async function NewIdeaPage({
                     id="content"
                     name="content"
                     className="min-h-56"
-                    placeholder="누가 쓰는지, 어떤 문제가 있는지, 어떤 결과를 얻고 싶은지 중심으로 적어 주세요."
+                    placeholder="왜 필요한지, 어떤 문제가 있는지, 어떤 결과를 기대하는지 문단으로 적어 주세요."
                     required
                   />
                 </div>
 
                 {params.error ? (
                   <p className="text-sm text-accent">
-                    저장하지 못했습니다. Supabase 테이블이 아직 준비되지 않았거나 입력값이 비어 있을 수 있습니다.
+                    저장하지 못했습니다. Supabase 테이블이 아직 준비되지 않았거나 입력값이 비어
+                    있을 수 있습니다.
                   </p>
                 ) : null}
 
                 <div className="flex flex-wrap gap-3">
-                  <Button type="submit">등록하기</Button>
+                  <PendingSubmitButton pendingLabel="등록 중...">
+                    등록하기
+                  </PendingSubmitButton>
                   <Button asChild variant="outline">
                     <Link href="/ideas">목록으로</Link>
                   </Button>
                 </div>
+
+                <FormPendingOverlay
+                  label="아이디어를 등록하고 있어요..."
+                  className="rounded-[1.5rem]"
+                />
               </form>
             </CardContent>
           </Card>

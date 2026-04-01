@@ -2,8 +2,10 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { saveNicknameAction } from "@/app/auth/onboarding/actions";
-import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/auth/sign-out-button";
+import { FormPendingOverlay } from "@/components/ui/form-pending-overlay";
 import { Input } from "@/components/ui/input";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { getCurrentViewer } from "@/lib/auth/viewer";
 
 function AuthCanvas({ children }: { children: ReactNode }) {
@@ -43,54 +45,67 @@ export default async function OnboardingPage({
   }
 
   if (viewer.nickname) {
-    redirect(params.next || "/profile");
+    redirect(params.next || "/home");
   }
 
   return (
     <AuthCanvas>
-      <section className="w-full max-w-[500px] rounded-[2rem] border border-[rgba(121,118,127,0.08)] bg-white/94 px-7 py-8 shadow-[0_26px_70px_rgba(37,31,74,0.08)] backdrop-blur-xl">
-        <div className="space-y-2 text-center">
-          <h1 className="text-5xl font-extrabold tracking-[-0.08em] text-primary">GoodVibe</h1>
-          <p className="text-base text-muted-foreground">
-            사용할 이름을 정하면 바로 Good Vibe를 시작할 수 있어요.
+      <section className="w-full max-w-[460px] rounded-[2.2rem] border border-[rgba(121,118,127,0.08)] bg-white/96 px-7 py-8 shadow-[0_30px_80px_rgba(37,31,74,0.08)] backdrop-blur-xl sm:px-9 sm:py-10">
+        <div className="space-y-3 text-center">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.32em] text-primary/45">
+            Google Login
+          </p>
+          <h1 className="text-4xl font-extrabold tracking-[-0.08em] text-primary sm:text-5xl">
+            닉네임을 정해 주세요
+          </h1>
+          <p className="text-sm leading-6 text-muted-foreground sm:text-base">
+            이 단계까지 끝나야 GoodVibe 로그인이 완료됩니다.
           </p>
         </div>
 
-        <form action={saveNicknameAction} className="mt-8 space-y-6">
-          <input type="hidden" name="next" value={params.next || "/profile"} />
+        <form action={saveNicknameAction} className="relative mt-8 space-y-5">
+          <input type="hidden" name="next" value={params.next || "/home"} />
 
           <div className="space-y-2">
             <label htmlFor="nickname" className="text-sm font-semibold text-foreground">
-              닉네임 또는 이름
+              닉네임
             </label>
             <Input
               id="nickname"
               name="nickname"
-              placeholder="사용할 이름을 입력해 주세요"
+              placeholder="2자 이상 닉네임을 입력해 주세요."
               minLength={2}
-              className="h-14 rounded-2xl"
+              className="h-14 rounded-[1.35rem] px-5 text-base"
               required
             />
           </div>
 
           {params.error === "nickname" ? (
-            <p className="rounded-[1rem] bg-[rgba(255,107,108,0.08)] px-4 py-3 text-sm text-secondary">
-              닉네임은 2글자 이상으로 입력해 주세요.
+            <p className="rounded-[1.15rem] bg-[rgba(255,107,108,0.08)] px-4 py-3 text-sm text-secondary">
+              닉네임은 2자 이상으로 입력해 주세요.
             </p>
           ) : null}
 
-          <Button
-            type="submit"
+          <PendingSubmitButton
             variant="secondary"
-            className="h-14 w-full rounded-2xl text-lg shadow-[0_18px_28px_rgba(176,72,72,0.18)]"
+            className="h-14 w-full rounded-[1.35rem] text-lg shadow-[0_18px_28px_rgba(176,72,72,0.18)]"
+            pendingLabel="저장 중..."
           >
-            시작하기
-          </Button>
+            계속하기
+          </PendingSubmitButton>
+
+          <FormPendingOverlay
+            label="닉네임을 저장하고 있어요..."
+            className="rounded-[1.35rem]"
+          />
         </form>
 
-        <p className="mt-10 text-center text-sm text-muted-foreground">
-          이 이름은 게시글 작성과 활동 기록에 함께 표시됩니다.
-        </p>
+        <SignOutButton
+          label="로그인 취소"
+          redirectTo="/profile"
+          variant="ghost"
+          className="mt-3 h-12 w-full rounded-[1.35rem]"
+        />
       </section>
     </AuthCanvas>
   );

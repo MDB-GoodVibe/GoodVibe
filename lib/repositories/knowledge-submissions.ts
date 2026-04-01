@@ -8,11 +8,7 @@ import type {
 } from "@/types/good-vibe";
 
 function normalizeCategory(value: string): KnowledgeTrack {
-  if (
-    value === "level-up" ||
-    value === "tips" ||
-    value === "external"
-  ) {
+  if (value === "level-up" || value === "tips" || value === "external") {
     return value;
   }
 
@@ -20,11 +16,7 @@ function normalizeCategory(value: string): KnowledgeTrack {
 }
 
 function normalizeStatus(value: string): KnowledgeSubmissionStatus {
-  if (
-    value === "reviewing" ||
-    value === "accepted" ||
-    value === "rejected"
-  ) {
+  if (value === "reviewing" || value === "accepted" || value === "rejected") {
     return value;
   }
 
@@ -124,4 +116,24 @@ export async function listKnowledgeSubmissionsForAdmin() {
   }
 
   return data.map(normalizeRow);
+}
+
+export async function getKnowledgeSubmissionForAdmin(id: string) {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("knowledge_submissions")
+    .select(submissionSelect)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return normalizeRow(data);
 }

@@ -31,6 +31,7 @@ type SidebarItem = {
   label: string;
   icon: LucideIcon;
   match?: string[];
+  exact?: boolean;
 };
 
 type SidebarGroup = {
@@ -43,7 +44,6 @@ type SidebarCallout = {
   description: string;
   actionLabel: string;
   href: string;
-  tone: "soft" | "accent";
 };
 
 type SidebarConfig = {
@@ -65,28 +65,34 @@ const mainTabs = [
   { href: "/helper/idea", label: "바이브 헬퍼", match: ["/helper"] },
 ] as const;
 
-function isActiveMainTab(pathname: string, href: string, matches?: readonly string[]) {
-  const candidates = matches ?? [href];
-
+function matchesPath(
+  pathname: string,
+  candidates: readonly string[],
+  exact = false,
+) {
   return candidates.some((candidate) => {
     if (pathname === candidate) {
       return true;
+    }
+
+    if (exact) {
+      return false;
     }
 
     return candidate !== "/" && pathname.startsWith(`${candidate}/`);
   });
 }
 
+function isActiveMainTab(
+  pathname: string,
+  href: string,
+  matches?: readonly string[],
+) {
+  return matchesPath(pathname, matches ?? [href]);
+}
+
 function isActivePath(pathname: string, item: SidebarItem) {
-  const candidates = item.match ?? [item.href];
-
-  return candidates.some((candidate) => {
-    if (pathname === candidate) {
-      return true;
-    }
-
-    return candidate !== "/" && pathname.startsWith(`${candidate}/`);
-  });
+  return matchesPath(pathname, item.match ?? [item.href], item.exact);
 }
 
 function getSection(pathname: string) {
@@ -101,11 +107,14 @@ function getSection(pathname: string) {
   return null;
 }
 
-function getSidebarConfig(section: ReturnType<typeof getSection>, isAdmin: boolean) {
+function getSidebarConfig(
+  section: ReturnType<typeof getSection>,
+  isAdmin: boolean,
+) {
   switch (section) {
     case "knowledge":
       return {
-        title: "지식 베이스",
+        title: "지식베이스",
         subtitle: "Good Vibe 백과사전",
         icon: BookOpen,
         groups: [
@@ -123,7 +132,7 @@ function getSidebarConfig(section: ReturnType<typeof getSection>, isAdmin: boole
               },
               {
                 href: "/knowledge/tips",
-                label: "꿀팁 모음",
+                label: "팁 모음",
                 icon: Lightbulb,
               },
               {
@@ -147,11 +156,15 @@ function getSidebarConfig(section: ReturnType<typeof getSection>, isAdmin: boole
                       href: "/admin/knowledge",
                       label: "지식 문서 관리",
                       icon: FileText,
+                      match: ["/admin/knowledge", "/admin/knowledge/new"],
+                      exact: true,
                     },
                     {
                       href: "/admin/knowledge/submissions",
                       label: "지식 제보함",
                       icon: WandSparkles,
+                      match: ["/admin/knowledge/submissions"],
+                      exact: true,
                     },
                   ],
                 },
@@ -159,11 +172,11 @@ function getSidebarConfig(section: ReturnType<typeof getSection>, isAdmin: boole
             : []),
         ],
         callout: {
-          title: "지식제보하기",
-          description: "새로운 인사이트나 유용한 링크를 관리자에게 추천해 보세요.",
+          title: "지식 제보하기",
+          description:
+            "새로운 인사이트나 유용한 링크를 관리자에게 추천해 보세요.",
           actionLabel: "기여하기",
           href: "/knowledge/contribute",
-          tone: "soft",
         },
       } satisfies SidebarConfig;
 
@@ -179,11 +192,15 @@ function getSidebarConfig(section: ReturnType<typeof getSection>, isAdmin: boole
                 href: "/admin/knowledge",
                 label: "지식 문서 관리",
                 icon: FileText,
+                match: ["/admin/knowledge", "/admin/knowledge/new"],
+                exact: true,
               },
               {
                 href: "/admin/knowledge/submissions",
                 label: "지식 제보함",
                 icon: WandSparkles,
+                match: ["/admin/knowledge/submissions"],
+                exact: true,
               },
             ],
           },
@@ -385,7 +402,10 @@ export function ServiceShell({ children }: { children: ReactNode }) {
               <div className="mt-7 flex-1 space-y-7">
                 {sidebarConfig.groups.map((group) => (
                   <div
-                    key={("title" in group ? group.title : undefined) ?? group.items.map((item) => item.href).join("-")}
+                    key={
+                      ("title" in group ? group.title : undefined) ??
+                      group.items.map((item) => item.href).join("-")
+                    }
                     className="space-y-2"
                   >
                     {"title" in group && group.title ? (
@@ -420,7 +440,12 @@ export function ServiceShell({ children }: { children: ReactNode }) {
                             >
                               <Icon className="size-4" />
                             </div>
-                            <span className={cn("text-[13px]", active ? "font-semibold" : "font-medium")}>
+                            <span
+                              className={cn(
+                                "text-[13px]",
+                                active ? "font-semibold" : "font-medium",
+                              )}
+                            >
                               {item.label}
                             </span>
                           </Link>
@@ -432,17 +457,17 @@ export function ServiceShell({ children }: { children: ReactNode }) {
               </div>
 
               {sidebarConfig.callout ? (
-                <div
-                  className={cn(
-                    "mt-7 rounded-[1.7rem] border border-[rgba(255,107,108,0.22)] bg-[rgba(255,107,108,0.06)] px-5 py-5 text-primary",
-                  )}
-                >
-                  <p className="text-lg font-bold tracking-[-0.03em]">{sidebarConfig.callout.title}</p>
+                <div className="mt-7 rounded-[1.7rem] border border-[rgba(255,107,108,0.22)] bg-[rgba(255,107,108,0.06)] px-5 py-5 text-primary">
+                  <p className="text-lg font-bold tracking-[-0.03em]">
+                    {sidebarConfig.callout.title}
+                  </p>
                   <p className="mt-2 text-[13px] leading-6 text-muted-foreground">
                     {sidebarConfig.callout.description}
                   </p>
                   <Button asChild variant="secondary" className="mt-5 w-full">
-                    <Link href={sidebarConfig.callout.href}>{sidebarConfig.callout.actionLabel}</Link>
+                    <Link href={sidebarConfig.callout.href}>
+                      {sidebarConfig.callout.actionLabel}
+                    </Link>
                   </Button>
                 </div>
               ) : null}

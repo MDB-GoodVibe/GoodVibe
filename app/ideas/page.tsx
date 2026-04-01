@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus, Search, Sparkles, ThumbsUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { getCurrentViewer } from "@/lib/auth/viewer";
 import { listIdeaPosts } from "@/lib/repositories/ideas";
 import type { IdeaSort } from "@/types/good-vibe";
@@ -60,8 +61,8 @@ export default async function IdeasPage({
           <p className="text-[12px] font-semibold text-muted-foreground">아이디어 플로우</p>
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {[
-              ["01", "등록", "생각난 문제나 서비스 아이디어를 올립니다."],
-              ["02", "투표", "공감이 많은 아이디어를 먼저 고릅니다."],
+              ["01", "등록", "생각한 문제나 서비스 아이디어를 올립니다."],
+              ["02", "투표", "공감되는 아이디어를 먼저 골라냅니다."],
               ["03", "연결", "선택한 아이디어를 헬퍼로 이어갑니다."],
             ].map(([step, title, body]) => (
               <div key={step} className="rounded-[1.2rem] bg-[rgba(244,243,243,0.9)] px-4 py-4">
@@ -104,15 +105,15 @@ export default async function IdeasPage({
               />
               <input type="hidden" name="sort" value={sort} />
             </div>
-            <Button type="submit" size="sm">
+            <PendingSubmitButton size="sm" pendingLabel="검색 중...">
               검색
-            </Button>
+            </PendingSubmitButton>
           </form>
 
           <div className="inline-flex rounded-full border border-[rgba(121,118,127,0.12)] bg-[rgba(244,243,243,0.92)] p-1">
             <Button asChild size="sm" variant={sort === "latest" ? "secondary" : "ghost"}>
               <Link href={query ? `/ideas?sort=latest&q=${encodeURIComponent(query)}` : "/ideas?sort=latest"}>
-                등록순
+                최신순
               </Link>
             </Button>
             <Button asChild size="sm" variant={sort === "popular" ? "secondary" : "ghost"}>

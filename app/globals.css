@@ -202,6 +202,242 @@ body::before {
   font-family: var(--font-sans);
 }
 
+.knowledge-prose {
+  color: rgba(37, 31, 74, 0.94);
+  font-size: 1rem;
+  line-height: 1.95;
+}
+
+.knowledge-prose > * + * {
+  margin-top: 1.35rem;
+}
+
+.knowledge-prose h1,
+.knowledge-prose h2,
+.knowledge-prose h3,
+.knowledge-prose h4 {
+  position: relative;
+  scroll-margin-top: 6rem;
+  color: var(--primary);
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.05em;
+}
+
+.knowledge-prose h1 {
+  margin-top: 0;
+  font-size: clamp(2rem, 3vw, 3.25rem);
+}
+
+.knowledge-prose h2 {
+  margin-top: 3.25rem;
+  font-size: clamp(1.65rem, 2.2vw, 2.35rem);
+}
+
+.knowledge-prose h3 {
+  margin-top: 2.35rem;
+  font-size: clamp(1.3rem, 1.7vw, 1.65rem);
+}
+
+.knowledge-prose h4 {
+  margin-top: 1.9rem;
+  font-size: 1.12rem;
+}
+
+.knowledge-prose p,
+.knowledge-prose li,
+.knowledge-prose blockquote {
+  color: rgba(37, 31, 74, 0.9);
+}
+
+.knowledge-prose p strong,
+.knowledge-prose li strong,
+.knowledge-prose blockquote strong {
+  color: var(--primary);
+}
+
+.knowledge-prose ul,
+.knowledge-prose ol {
+  margin-left: 1.3rem;
+  padding-left: 0.4rem;
+}
+
+.knowledge-prose ul {
+  list-style: disc;
+}
+
+.knowledge-prose ol {
+  list-style: decimal;
+}
+
+.knowledge-prose li + li {
+  margin-top: 0.55rem;
+}
+
+.knowledge-prose li::marker {
+  color: rgba(221, 115, 115, 0.9);
+  font-weight: 700;
+}
+
+.knowledge-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+
+.knowledge-prose thead {
+  background: rgba(59, 53, 97, 0.06);
+}
+
+.knowledge-prose th,
+.knowledge-prose td {
+  border: 1px solid rgba(121, 118, 127, 0.12);
+  padding: 0.9rem 1rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.knowledge-prose th {
+  color: var(--primary);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.knowledge-prose td {
+  color: rgba(37, 31, 74, 0.84);
+  font-size: 0.95rem;
+}
+
+.knowledge-prose hr {
+  margin-block: 2.3rem;
+}
+
+.knowledge-link {
+  color: var(--secondary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(221, 115, 115, 0.32);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+  transition:
+    color 180ms ease,
+    text-decoration-color 180ms ease;
+}
+
+.knowledge-link:hover {
+  color: color-mix(in srgb, var(--secondary) 80%, black);
+  text-decoration-color: rgba(221, 115, 115, 0.75);
+}
+
+.knowledge-inline-code {
+  border: 1px solid rgba(121, 118, 127, 0.12);
+  background: rgba(59, 53, 97, 0.05);
+  padding: 0.16rem 0.48rem;
+  border-radius: 999px;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.knowledge-code-block {
+  overflow: hidden;
+  border: 1px solid rgba(121, 118, 127, 0.12);
+  border-radius: 1.55rem;
+  background: linear-gradient(180deg, #1e1f33 0%, #282a44 100%);
+  box-shadow:
+    0 18px 38px rgba(37, 31, 74, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.knowledge-code-header {
+  display: flex;
+  align-items: center;
+  min-height: 2.9rem;
+  padding-inline: 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+}
+
+.knowledge-code-pre {
+  overflow-x: auto;
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.knowledge-code-content {
+  color: rgba(248, 250, 252, 0.95);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+.knowledge-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(121, 118, 127, 0.12);
+  border-radius: 1.45rem;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.knowledge-blockquote {
+  border-left: 4px solid rgba(221, 115, 115, 0.48);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 108, 0.08) 0%,
+    rgba(255, 255, 255, 0.94) 100%
+  );
+  padding: 1rem 1.1rem;
+  border-radius: 0 1.25rem 1.25rem 0;
+  color: rgba(37, 31, 74, 0.82);
+}
+
+.knowledge-divider {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(121, 118, 127, 0.2) 20%,
+    rgba(121, 118, 127, 0.2) 80%,
+    transparent 100%
+  );
+}
+
+.knowledge-image {
+  width: 100%;
+  border: 1px solid rgba(121, 118, 127, 0.12);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 18px 36px rgba(37, 31, 74, 0.08);
+}
+
+.knowledge-heading-anchor {
+  margin-left: 0.45rem;
+  color: rgba(104, 100, 118, 0.48);
+  font-size: 0.8em;
+  opacity: 0;
+  text-decoration: none;
+  transition:
+    opacity 180ms ease,
+    color 180ms ease;
+}
+
+.knowledge-prose h1:hover .knowledge-heading-anchor,
+.knowledge-prose h2:hover .knowledge-heading-anchor,
+.knowledge-prose h3:hover .knowledge-heading-anchor,
+.knowledge-prose h4:hover .knowledge-heading-anchor,
+.knowledge-heading-anchor:focus {
+  opacity: 1;
+}
+
+.knowledge-heading-anchor:hover {
+  color: var(--secondary);
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;

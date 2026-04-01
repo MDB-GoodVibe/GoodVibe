@@ -1,13 +1,13 @@
 import "server-only";
 
+import { normalizeNickname } from "@/lib/auth/nickname";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ViewerProfile, ViewerRole } from "@/types/good-vibe";
 
 function extractNickname(user: {
   user_metadata?: Record<string, unknown> | null;
 }) {
-  const nickname = user.user_metadata?.nickname;
-  return typeof nickname === "string" ? nickname : null;
+  return normalizeNickname(user.user_metadata?.nickname);
 }
 
 function extractRole(user: {
@@ -46,7 +46,7 @@ export async function getCurrentViewer(): Promise<ViewerProfile | null> {
     .maybeSingle();
 
   if (profile) {
-    nickname = typeof profile.nickname === "string" ? profile.nickname : nickname;
+    nickname = normalizeNickname(profile.nickname) ?? nickname;
     avatarUrl =
       typeof profile.avatar_url === "string" ? profile.avatar_url : avatarUrl;
     role = profile.role === "admin" ? "admin" : role;
