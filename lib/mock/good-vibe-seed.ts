@@ -8,6 +8,7 @@ export const seedIdeaPosts: IdeaPost[] = [
     title: "카페 예약 문의와 메뉴 소개를 한 번에 보여주는 브랜드 페이지",
     content:
       "메뉴, 분위기, 예약 문의를 한 화면에 담고 사장님이 손쉽게 수정할 수 있는 소개 사이트를 만들고 싶습니다. 비개발자도 운영하기 쉬운 구조였으면 좋겠어요.",
+    referenceLinks: [],
     authorId: "seed-user-1",
     authorName: "민지",
     status: "published",
@@ -22,6 +23,7 @@ export const seedIdeaPosts: IdeaPost[] = [
     title: "문서 업로드 후 요약 보고서를 바로 만드는 AI 도구",
     content:
       "PDF나 텍스트 파일을 올리면 핵심 요약, 액션 아이템, 간단한 보고서 초안까지 자동으로 정리해 주는 서비스가 필요합니다. 초보자도 결과를 바로 이해할 수 있으면 좋겠습니다.",
+    referenceLinks: [],
     authorId: "seed-user-2",
     authorName: "준호",
     status: "published",
@@ -36,6 +38,7 @@ export const seedIdeaPosts: IdeaPost[] = [
     title: "수업 자료와 공지를 관리하는 간단한 학습 대시보드",
     content:
       "강의 자료, 공지, 과제 제출 현황을 한곳에서 확인할 수 있는 가벼운 대시보드가 있으면 좋겠습니다. 로그인과 역할 구분만 간단하게 들어가도 충분합니다.",
+    referenceLinks: [],
     authorId: "seed-user-3",
     authorName: "서연",
     status: "published",

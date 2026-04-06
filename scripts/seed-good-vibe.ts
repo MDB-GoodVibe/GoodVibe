@@ -93,32 +93,7 @@ const seedUsers: SeedUser[] = [
   },
 ];
 
-const seedIdeas: SeedIdea[] = [
-  {
-    id: "6b6d6bc7-6c76-4ec1-8dbd-9027216b7f01",
-    title: "지역 카페 예약 문의와 메뉴 소개를 동시에 해결하는 웹 서비스",
-    content:
-      "카페 소개, 대표 메뉴, 예약 문의를 한 화면에서 끝낼 수 있는 서비스가 필요합니다. 운영자는 예약 문의를 모아보고 응답 상태를 관리할 수 있으면 좋겠습니다.",
-    authorEmail: "seed-minji@goodvibe.example",
-    createdAt: "2026-03-20T09:00:00.000Z",
-  },
-  {
-    id: "4dc2a928-1f7f-4820-b6f5-b1e955d5f202",
-    title: "보고서 초안을 자동으로 만드는 문서 요약 도구",
-    content:
-      "PDF나 회의록을 올리면 핵심 요약, 실행 항목, 보고용 문장까지 한 번에 정리해 주는 도구를 만들고 싶습니다. 비개발자도 쓸 수 있을 만큼 쉽게 구성되면 좋겠습니다.",
-    authorEmail: "seed-junho@goodvibe.example",
-    createdAt: "2026-03-21T10:30:00.000Z",
-  },
-  {
-    id: "f1885d6b-bc88-4e89-a85b-9f72745f8303",
-    title: "수업 자료, 공지, 과제 제출 현황을 한 번에 보는 클래스 대시보드",
-    content:
-      "강의자와 수강생이 자료, 공지, 제출 상태를 한 곳에서 확인할 수 있는 간단한 대시보드가 필요합니다. 처음에는 웹 버전부터 만들고 싶습니다.",
-    authorEmail: "seed-seoyeon@goodvibe.example",
-    createdAt: "2026-03-22T08:10:00.000Z",
-  },
-];
+const seedIdeas: SeedIdea[] = [];
 
 const defaultChecklist: ProjectChecklistItem[] = [
   { id: "idea", label: "아이디어 방향 확인", done: true },
@@ -133,7 +108,7 @@ const seedProjects: SeedProject[] = [
     title: "카페 예약 런칭 페이지",
     idea:
       "카페 소개와 대표 메뉴를 보여주고, 예약 문의를 간단히 받아 운영자가 빠르게 확인할 수 있는 서비스를 만들고 싶습니다.",
-    sourceIdeaId: "6b6d6bc7-6c76-4ec1-8dbd-9027216b7f01",
+    sourceIdeaId: null,
     ownerEmail: "seed-minji@goodvibe.example",
     serviceTypeId: "web-service",
     serviceTypeLabel: "웹 서비스",
@@ -159,7 +134,7 @@ const seedProjects: SeedProject[] = [
     title: "문서 요약 보고서 도우미",
     idea:
       "문서를 업로드하면 핵심 요약, 액션 아이템, 보고용 초안을 자동으로 만들어주는 도구가 필요합니다.",
-    sourceIdeaId: "4dc2a928-1f7f-4820-b6f5-b1e955d5f202",
+    sourceIdeaId: null,
     ownerEmail: "seed-junho@goodvibe.example",
     serviceTypeId: "data-tool",
     serviceTypeLabel: "데이터 도구",
@@ -330,12 +305,14 @@ async function run() {
     updated_at: idea.createdAt,
   }));
 
-  const ideasResult = await supabase
-    .from("ideas")
-    .upsert(ideaRows, { onConflict: "id" });
+  if (ideaRows.length > 0) {
+    const ideasResult = await supabase
+      .from("ideas")
+      .upsert(ideaRows, { onConflict: "id" });
 
-  if (ideasResult.error) {
-    throw ideasResult.error;
+    if (ideasResult.error) {
+      throw ideasResult.error;
+    }
   }
 
   const projectRows = seedProjects.map((project) =>

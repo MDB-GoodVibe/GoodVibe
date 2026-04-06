@@ -21,6 +21,7 @@ export interface IdeaPost {
   id: string;
   title: string;
   content: string;
+  referenceLinks: string[];
   authorId: string;
   authorName: string;
   status: IdeaPostStatus;

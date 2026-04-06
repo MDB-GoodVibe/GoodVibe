@@ -8,7 +8,13 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Button } from "@/components/ui/button";
 import { getCurrentViewer } from "@/lib/auth/viewer";
 
-function AuthCanvas({ children }: { children: ReactNode }) {
+function AuthCanvas({
+  children,
+  hideFooterBrand = false,
+}: {
+  children: ReactNode;
+  hideFooterBrand?: boolean;
+}) {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#faf9f9_0%,#f4f2f5_100%)]">
       <div className="absolute left-[-8%] top-[14%] h-80 w-80 rounded-full bg-[rgba(91,95,151,0.08)] blur-3xl" />
@@ -19,14 +25,20 @@ function AuthCanvas({ children }: { children: ReactNode }) {
         <div className="flex flex-1 items-center justify-center px-6 py-16">{children}</div>
 
         <footer className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 px-8 pb-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-          <p className="font-semibold text-primary">Good Vibe</p>
+          <p className="font-semibold text-primary">
+            {hideFooterBrand ? "서비스 안내" : "Good Vibe"}
+          </p>
           <div className="flex flex-wrap gap-6">
             <span>개인정보처리방침</span>
             <span>이용약관</span>
             <span>고객지원</span>
             <span>상태</span>
           </div>
-          <span>© 2024 Good Vibe Service. All rights reserved.</span>
+          <span>
+            {hideFooterBrand
+              ? "© 2024 Service. All rights reserved."
+              : "© 2024 Good Vibe Service. All rights reserved."}
+          </span>
         </footer>
       </div>
     </main>
@@ -42,22 +54,19 @@ export default async function ProfilePage() {
 
   if (!viewer) {
     return (
-      <AuthCanvas>
+      <AuthCanvas hideFooterBrand>
         <section className="w-full max-w-[430px] rounded-[2.2rem] border border-[rgba(121,118,127,0.08)] bg-white/96 px-7 py-8 shadow-[0_30px_80px_rgba(37,31,74,0.08)] backdrop-blur-xl sm:px-9 sm:py-10">
-          <div className="space-y-8">
-            <div className="space-y-3 text-center">
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.36em] text-primary/45">
-                Good Vibe
-              </p>
+          <div className="space-y-6">
+            <div className="space-y-4 text-center">
               <h1 className="text-5xl font-extrabold tracking-[-0.08em] text-primary sm:text-6xl">
                 GoodVibe
               </h1>
+              <p className="text-sm leading-7 text-muted-foreground">
+                아이디어를 모으고, 발전시키고, 바로 실행 흐름으로 연결하는 시작 화면입니다.
+              </p>
             </div>
 
-            <GoogleSignInButton
-              next="/home"
-              className="h-16 rounded-[1.8rem] text-[1.15rem]"
-            />
+            <GoogleSignInButton next="/home" />
           </div>
         </section>
       </AuthCanvas>
