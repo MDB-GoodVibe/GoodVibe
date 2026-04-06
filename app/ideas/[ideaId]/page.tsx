@@ -37,9 +37,9 @@ export default async function IdeaDetailPage({
   const canEdit = viewer?.id === idea.authorId;
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
-      <article className="min-w-0 space-y-8">
-        <header className="rounded-[2rem] border border-[rgba(121,118,127,0.08)] bg-white px-7 py-8 shadow-[0_18px_38px_rgba(37,31,74,0.05)]">
+    <div className="grid gap-5 sm:gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <article className="min-w-0 space-y-5 sm:space-y-8">
+        <header className="rounded-[1.8rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_18px_38px_rgba(37,31,74,0.05)] sm:rounded-[2rem] sm:px-7 sm:py-8">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span className="rounded-full border border-[rgba(91,95,151,0.12)] bg-[rgba(255,255,255,0.72)] px-3 py-1">
               {idea.authorName}
@@ -51,17 +51,17 @@ export default async function IdeaDetailPage({
           </div>
 
           <div className="mt-5 space-y-4">
-            <h1 className="text-[clamp(1.55rem,2.2vw,2.05rem)] font-extrabold tracking-[-0.04em] text-primary">
+            <h1 className="text-[clamp(1.3rem,1.9vw,1.8rem)] font-extrabold tracking-[-0.04em] text-primary">
               {idea.title}
             </h1>
-            <p className="max-w-4xl whitespace-pre-wrap text-[15px] leading-8 text-foreground/92">
+            <p className="max-w-4xl whitespace-pre-wrap text-[14px] leading-7 text-foreground/92 sm:text-[15px] sm:leading-8">
               {idea.content}
             </p>
           </div>
         </header>
 
         {idea.referenceLinks.length > 0 ? (
-          <section className="rounded-[2rem] border border-[rgba(121,118,127,0.08)] bg-white px-7 py-7 shadow-[0_18px_38px_rgba(37,31,74,0.05)]">
+          <section className="rounded-[1.8rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_18px_38px_rgba(37,31,74,0.05)] sm:rounded-[2rem] sm:px-7 sm:py-7">
             <div className="space-y-4">
               <div>
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-secondary">
@@ -92,7 +92,7 @@ export default async function IdeaDetailPage({
       </article>
 
       <aside className="space-y-4">
-        <div className="rounded-[1.9rem] bg-secondary px-6 py-6 text-white shadow-[0_22px_46px_rgba(176,72,72,0.18)]">
+        <div className="rounded-[1.7rem] bg-secondary px-5 py-5 text-white shadow-[0_22px_46px_rgba(176,72,72,0.18)] sm:rounded-[1.9rem] sm:px-6 sm:py-6">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/72">
             참여하기
           </p>

@@ -37,7 +37,7 @@ function IdeaVoteSubmit({
         aria-busy={pending}
         aria-pressed={voted}
         className={cn(
-          "inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-white font-semibold text-secondary transition hover:bg-white/92 disabled:pointer-events-none disabled:opacity-70",
+          "inline-flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-white font-semibold text-secondary transition hover:bg-white/92 disabled:pointer-events-none disabled:opacity-70",
           className,
         )}
       >
@@ -58,7 +58,7 @@ function IdeaVoteSubmit({
       aria-busy={pending}
       aria-pressed={voted}
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold transition disabled:pointer-events-none disabled:opacity-70",
+        "inline-flex cursor-pointer items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold transition disabled:pointer-events-none disabled:opacity-70",
         voted
           ? "bg-[rgba(59,53,97,0.12)] text-primary"
           : "bg-[rgba(244,243,243,0.92)] text-primary hover:bg-[rgba(59,53,97,0.08)]",

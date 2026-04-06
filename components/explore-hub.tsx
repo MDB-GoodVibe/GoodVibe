@@ -160,14 +160,14 @@ export function ExploreHub({
   }
 
   return (
-    <div className="space-y-8">
-      <section className="hero-surface px-7 py-8 sm:px-9 sm:py-10">
+    <div className="space-y-6 sm:space-y-8">
+      <section className="hero-surface px-5 py-6 sm:px-9 sm:py-10">
         <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl space-y-4">
             <p className="inline-flex rounded-full bg-white/12 px-4 py-1 text-[11px] font-extrabold uppercase tracking-[0.24em] text-white/82">
               {kind === "skills" ? "Skills" : "Plugins & Marketplaces"}
             </p>
-            <h1 className="text-2xl font-extrabold leading-[1.08] tracking-[-0.05em] text-white sm:text-3xl">
+            <h1 className="text-[1.55rem] font-extrabold leading-[1.08] tracking-[-0.05em] text-white sm:text-3xl">
               {kind === "skills" ? "프로젝트에 맞는 스킬 탐색" : "연결할 플러그인과 마켓 탐색"}
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
@@ -184,7 +184,7 @@ export function ExploreHub({
         </div>
       </section>
 
-      <section className="surface-subtle rounded-[2rem] px-6 py-6">
+      <section className="surface-subtle rounded-[1.8rem] px-4 py-4 sm:rounded-[2rem] sm:px-6 sm:py-6">
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:items-center">
           <div className="relative">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -200,14 +200,14 @@ export function ExploreHub({
             />
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
             {sourceFilters.map((filter) => (
               <button
                 key={filter.id}
                 type="button"
                 onClick={() => setSource(filter.id)}
                 className={cn(
-                  "rounded-full px-4 py-2 text-sm font-medium transition",
+                  "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition",
                   source === filter.id
                     ? "bg-primary text-white"
                     : "bg-[rgba(244,243,243,0.92)] text-muted-foreground hover:bg-white hover:text-primary",
@@ -219,14 +219,14 @@ export function ExploreHub({
           </div>
 
           {kind === "skills" ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
               {sortOptions.map((option) => (
                 <button
                   key={option.id}
                   type="button"
                   onClick={() => setSort(option.id)}
                   className={cn(
-                    "rounded-full px-4 py-2 text-sm font-medium transition",
+                    "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition",
                     sort === option.id
                       ? "bg-secondary text-white"
                       : "bg-[rgba(244,243,243,0.92)] text-muted-foreground hover:bg-white hover:text-primary",
@@ -240,14 +240,14 @@ export function ExploreHub({
         </div>
 
         {recommendedItems.length > 0 ? (
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-5 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
             {recommendedItems.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => setSelectedId(item.id)}
                 className={cn(
-                  "rounded-full px-4 py-2 text-xs font-semibold transition",
+                  "shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition",
                   selectedItem?.id === item.id
                     ? "bg-[rgba(221,115,115,0.14)] text-secondary"
                     : "bg-[rgba(244,243,243,0.92)] text-muted-foreground hover:bg-white hover:text-primary",
@@ -285,13 +285,13 @@ export function ExploreHub({
                 type="button"
                 onClick={() => setSelectedId(item.id)}
                 className={cn(
-                  "w-full rounded-[1.8rem] px-5 py-5 text-left transition-all",
+                  "w-full rounded-[1.6rem] px-4 py-4 text-left transition-all sm:rounded-[1.8rem] sm:px-5 sm:py-5",
                   selectedItem?.id === item.id
                     ? "bg-primary text-white shadow-[0_16px_34px_rgba(37,31,74,0.14)]"
                     : "bg-white text-foreground shadow-[0_10px_24px_rgba(37,31,74,0.05)] hover:-translate-y-0.5",
                 )}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                   <div className="min-w-0 flex-1 space-y-2">
                     <div className="flex flex-wrap items-center gap-2 text-xs">
                       <span
@@ -314,7 +314,7 @@ export function ExploreHub({
                         {item.popularityLabel}
                       </span>
                     </div>
-                    <h2 className="text-lg font-extrabold tracking-[-0.03em]">
+                    <h2 className="text-base font-extrabold tracking-[-0.03em] sm:text-lg">
                       {item.title}
                     </h2>
                     <p
@@ -329,7 +329,7 @@ export function ExploreHub({
                     </p>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <p
                       className={cn(
                         "text-sm font-bold",
@@ -348,7 +348,7 @@ export function ExploreHub({
 
         <div className="space-y-4">
           {selectedItem ? (
-            <section className="surface-subtle rounded-[2rem] px-6 py-6">
+            <section className="surface-subtle rounded-[1.8rem] px-5 py-5 sm:rounded-[2rem] sm:px-6 sm:py-6">
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="rounded-full bg-[rgba(59,53,97,0.08)] px-3 py-1 font-semibold text-primary">
                   {selectedItem.sourceLabel}
@@ -357,7 +357,7 @@ export function ExploreHub({
               </div>
 
               <div className="mt-4 space-y-3">
-                <h2 className="text-xl font-extrabold tracking-[-0.04em] text-primary">
+                <h2 className="text-lg font-extrabold tracking-[-0.04em] text-primary sm:text-xl">
                   {selectedItem.title}
                 </h2>
                 <p className="text-sm leading-7 text-muted-foreground">
@@ -377,8 +377,8 @@ export function ExploreHub({
               </div>
 
               {selectedItem.installCommand ? (
-                <div className="mt-6 rounded-[1.6rem] bg-primary px-5 py-5 text-white">
-                  <div className="flex items-start justify-between gap-4">
+                <div className="mt-6 rounded-[1.5rem] bg-primary px-4 py-4 text-white sm:rounded-[1.6rem] sm:px-5 sm:py-5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-white/62">
                         설치 명령어
@@ -391,7 +391,7 @@ export function ExploreHub({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-white/18 bg-white/10 text-white hover:bg-white/16"
+                      className="w-full border-white/18 bg-white/10 text-white hover:bg-white/16 sm:w-auto"
                       onClick={() => void copyInstallCommand(selectedItem.installCommand!)}
                     >
                       <Copy className="size-4" />
@@ -420,7 +420,7 @@ export function ExploreHub({
             </section>
           ) : null}
 
-          <section className="surface-subtle rounded-[1.8rem] px-6 py-6">
+          <section className="surface-subtle rounded-[1.7rem] px-5 py-5 sm:rounded-[1.8rem] sm:px-6 sm:py-6">
             <p className="text-lg font-bold text-primary">바로 이동</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               결과가 부족하면 원본 사이트에서 더 깊게 탐색할 수 있어요.

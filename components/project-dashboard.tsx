@@ -43,8 +43,8 @@ export function ProjectDashboard({
   );
 
   return (
-    <div className="space-y-8">
-      <section className="hero-surface px-7 py-8 sm:px-9 sm:py-10">
+    <div className="space-y-6 sm:space-y-8">
+      <section className="hero-surface px-5 py-6 sm:px-9 sm:py-10">
         <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-4">
             <p className="inline-flex rounded-full bg-white/12 px-4 py-1 text-[11px] font-extrabold uppercase tracking-[0.24em] text-white/82">
@@ -58,14 +58,14 @@ export function ProjectDashboard({
             </p>
           </div>
 
-          <Button asChild variant="secondary">
+          <Button asChild variant="secondary" className="w-full sm:w-auto">
             <Link href="/helper/idea">Helper 시작하기</Link>
           </Button>
         </div>
       </section>
 
       {filteredProjects.length === 0 ? (
-        <section className="surface-subtle rounded-[2rem] px-6 py-12 text-center">
+        <section className="surface-subtle rounded-[1.8rem] px-5 py-10 text-center sm:rounded-[2rem] sm:px-6 sm:py-12">
           <p className="text-lg font-bold text-primary">
             {view === "saved"
               ? "아직 저장된 프로젝트가 없어요."
@@ -74,7 +74,7 @@ export function ProjectDashboard({
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             아이디어를 정리하고 첫 번째 프로젝트를 만들어보세요.
           </p>
-          <Button asChild className="mt-5">
+          <Button asChild className="mt-5 w-full sm:w-auto">
             <Link href="/helper/idea">
               Helper 시작하기
               <ArrowRight className="size-4" />
@@ -91,9 +91,9 @@ export function ProjectDashboard({
             <Link
               key={project.id}
               href={`/helper/projects/${project.id}`}
-              className="group block rounded-[1.9rem] bg-white px-6 py-5 shadow-[0_14px_34px_rgba(37,31,74,0.05)] transition-transform duration-200 hover:-translate-y-0.5"
+              className="group block rounded-[1.7rem] bg-white px-5 py-4 shadow-[0_14px_34px_rgba(37,31,74,0.05)] transition-transform duration-200 hover:-translate-y-0.5 sm:rounded-[1.9rem] sm:px-6 sm:py-5"
             >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div className="min-w-0 flex-1 space-y-2">
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span className="rounded-full bg-[rgba(59,53,97,0.08)] px-3 py-1 font-semibold text-primary">
@@ -103,7 +103,7 @@ export function ProjectDashboard({
                       {statusLabelMap[project.status]}
                     </span>
                   </div>
-                  <h2 className="text-xl font-extrabold tracking-[-0.03em] text-primary">
+                  <h2 className="text-lg font-extrabold tracking-[-0.03em] text-primary sm:text-xl">
                     {project.title}
                   </h2>
                   <p className="line-clamp-2 max-w-3xl text-sm leading-7 text-muted-foreground">
@@ -111,7 +111,7 @@ export function ProjectDashboard({
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex w-full flex-wrap items-center gap-2.5 xl:w-auto xl:justify-end">
                   <span className="rounded-full bg-[rgba(244,243,243,0.92)] px-4 py-2 text-xs text-muted-foreground">
                     체크리스트 {completedCount}/{project.checklist.length}
                   </span>

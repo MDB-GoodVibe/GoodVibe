@@ -48,15 +48,15 @@ function CompactIntro({
     <div
       className={
         accent
-          ? "rounded-[1.8rem] bg-primary px-6 py-6 text-white shadow-[0_18px_36px_rgba(37,31,74,0.14)]"
-          : "rounded-[1.8rem] border border-[rgba(121,118,127,0.08)] bg-white px-6 py-6 shadow-[0_12px_24px_rgba(37,31,74,0.05)]"
+          ? "rounded-[1.6rem] bg-primary px-5 py-5 text-white shadow-[0_18px_36px_rgba(37,31,74,0.14)] sm:rounded-[1.8rem] sm:px-6 sm:py-6"
+          : "rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)] sm:rounded-[1.8rem] sm:px-6 sm:py-6"
       }
     >
       <h2
         className={
           accent
-            ? "text-[1.3rem] font-bold tracking-[-0.03em]"
-            : "text-[1.3rem] font-bold tracking-[-0.03em] text-primary"
+            ? "text-[1.12rem] font-bold tracking-[-0.03em] sm:text-[1.24rem]"
+            : "text-[1.12rem] font-bold tracking-[-0.03em] text-primary sm:text-[1.24rem]"
         }
       >
         {title}
@@ -75,8 +75,8 @@ function CompactIntro({
         variant={accent ? "outline" : "secondary"}
         className={
           accent
-            ? "mt-6 w-full border-white/18 bg-white text-primary hover:bg-white/92"
-            : "mt-6 w-full"
+            ? "mt-5 w-full border-white/18 bg-white text-primary hover:bg-white/92"
+            : "mt-5 w-full"
         }
       >
         <Link href={href}>
@@ -128,8 +128,8 @@ export default async function HomeDashboardPage() {
   const topIdeas = popularIdeas.slice(0, 3);
 
   return (
-    <div className="space-y-10 py-2">
-      <section className="grid gap-5 xl:grid-cols-[0.9fr_2.1fr] xl:items-stretch">
+    <div className="space-y-8 py-1 sm:space-y-10 sm:py-2">
+      <section className="grid gap-4 sm:gap-5 xl:grid-cols-[0.9fr_2.1fr] xl:items-stretch">
         <CompactIntro
           title="지식 베이스"
           description="4개 메뉴로 나누어 필요한 정보만 빠르게 찾아볼 수 있습니다."
@@ -137,16 +137,16 @@ export default async function HomeDashboardPage() {
           actionLabel="열기"
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
           {knowledgeMenus.map((menu) => (
             <Link
               key={menu.title}
               href={menu.href}
-              className="rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)] transition hover:-translate-y-0.5"
+              className="rounded-[1.5rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_12px_24px_rgba(37,31,74,0.05)] transition hover:-translate-y-0.5 sm:rounded-[1.6rem] sm:px-5 sm:py-5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-lg font-bold tracking-[-0.03em] text-primary">
+                  <p className="text-base font-bold tracking-[-0.03em] text-primary sm:text-lg">
                     {menu.title}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -162,14 +162,14 @@ export default async function HomeDashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[2.1fr_0.9fr] xl:items-stretch">
-        <div className="grid gap-4 xl:grid-cols-3">
+      <section className="grid gap-4 sm:gap-5 xl:grid-cols-[2.1fr_0.9fr] xl:items-stretch">
+        <div className="grid gap-3 sm:gap-4 xl:grid-cols-3">
           {topIdeas.length > 0 ? (
             topIdeas.map((idea, index) => (
               <Link
                 key={idea.id}
                 href={`/ideas/${idea.id}`}
-                className="rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)] transition hover:-translate-y-0.5"
+                className="rounded-[1.5rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_12px_24px_rgba(37,31,74,0.05)] transition hover:-translate-y-0.5 sm:rounded-[1.6rem] sm:px-5 sm:py-5"
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-secondary">
@@ -180,7 +180,7 @@ export default async function HomeDashboardPage() {
                     {idea.upvoteCount}
                   </span>
                 </div>
-                <h3 className="mt-4 text-lg font-bold tracking-[-0.03em] text-primary">
+                <h3 className="mt-3 text-base font-bold tracking-[-0.03em] text-primary sm:mt-4 sm:text-lg">
                   {idea.title}
                 </h3>
                 <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
@@ -203,7 +203,7 @@ export default async function HomeDashboardPage() {
         />
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[0.9fr_2.1fr] xl:items-stretch">
+      <section className="grid gap-4 sm:gap-5 xl:grid-cols-[0.9fr_2.1fr] xl:items-stretch">
         <CompactIntro
           title="바이브 헬퍼"
           description="실제 흐름에 맞춰 아이디어 → 구조 → 스킬 → 프롬프트로 이어지는 4단계 작업 순서를 안내합니다."
@@ -212,11 +212,11 @@ export default async function HomeDashboardPage() {
           tone="accent"
         />
 
-        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+        <div className="grid gap-3 sm:gap-4 md:grid-cols-2 2xl:grid-cols-4">
           {helperSteps.map((step) => (
             <article
               key={step.step}
-              className="rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)]"
+              className="rounded-[1.5rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_12px_24px_rgba(37,31,74,0.05)] sm:rounded-[1.6rem] sm:px-5 sm:py-5"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-secondary">
@@ -224,7 +224,7 @@ export default async function HomeDashboardPage() {
                 </span>
                 <Sparkles className="size-4 text-primary" />
               </div>
-              <h3 className="mt-4 text-lg font-bold tracking-[-0.03em] text-primary">
+              <h3 className="mt-3 text-base font-bold tracking-[-0.03em] text-primary sm:mt-4 sm:text-lg">
                 {step.title}
               </h3>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">

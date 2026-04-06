@@ -9,6 +9,7 @@ import {
   BookOpen,
   ExternalLink,
   FileText,
+  House,
   Lightbulb,
   Menu,
   Settings2,
@@ -55,7 +56,7 @@ type SidebarConfig = {
 };
 
 const mainTabs = [
-  { href: "/home", label: "Home", match: ["/home"] },
+  { href: "/home", label: "Home", icon: House, match: ["/home"] },
   {
     href: "/knowledge/basics",
     label: "지식베이스",
@@ -89,6 +90,21 @@ function isActiveMainTab(
   matches?: readonly string[],
 ) {
   return matchesPath(pathname, matches ?? [href]);
+}
+
+function getMainTabIcon(href: string) {
+  switch (href) {
+    case "/home":
+      return House;
+    case "/knowledge/basics":
+      return BookOpen;
+    case "/ideas":
+      return Lightbulb;
+    case "/helper/idea":
+      return WandSparkles;
+    default:
+      return House;
+  }
 }
 
 function isActivePath(pathname: string, item: SidebarItem) {
@@ -367,7 +383,7 @@ export function ServiceShell({ children }: { children: ReactNode }) {
         />
       ) : null}
 
-      <div className="section-shell flex gap-8 px-0 py-8">
+      <div className="section-shell flex gap-8 px-0 py-8 pb-24 md:pb-8">
         {showSidebar && sidebarConfig ? (
           <aside
             className={cn(
@@ -477,6 +493,31 @@ export function ServiceShell({ children }: { children: ReactNode }) {
 
         <main className="min-w-0 flex-1">{children}</main>
       </div>
+
+      <nav className="fixed inset-x-3 bottom-3 z-30 rounded-[1.45rem] border border-[rgba(121,118,127,0.12)] bg-[rgba(250,249,249,0.96)] p-2 shadow-[0_18px_44px_rgba(37,31,74,0.12)] backdrop-blur-xl md:hidden">
+        <div className="grid grid-cols-4 gap-1.5">
+          {mainTabs.map((tab) => {
+            const active = isActiveMainTab(pathname, tab.href, tab.match);
+            const Icon = getMainTabIcon(tab.href);
+
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={cn(
+                  "flex min-w-0 flex-col items-center gap-1 rounded-[1rem] px-2 py-2 text-[11px] font-medium transition",
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground/62 hover:bg-white hover:text-primary",
+                )}
+              >
+                <Icon className="size-4" />
+                <span className="truncate">{tab.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

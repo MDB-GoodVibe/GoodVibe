@@ -7,6 +7,7 @@ import {
   collectIdeaReferenceLinks,
   serializeIdeaReferenceLinks,
 } from "@/lib/ideas/reference-links";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function requireIdeaAuthor(
@@ -30,6 +31,28 @@ async function requireIdeaAuthor(
   }
 
   return supabase;
+}
+
+async function syncIdeaUpvoteCount(ideaId: string) {
+  const admin = createSupabaseAdminClient();
+
+  if (!admin) {
+    return;
+  }
+
+  const { count, error: countError } = await admin
+    .from("idea_votes")
+    .select("idea_id", { count: "exact", head: true })
+    .eq("idea_id", ideaId);
+
+  if (countError) {
+    return;
+  }
+
+  await admin
+    .from("ideas")
+    .update({ upvote_count: count ?? 0 })
+    .eq("id", ideaId);
 }
 
 export async function createIdeaPostAction(formData: FormData) {
@@ -175,6 +198,8 @@ export async function toggleIdeaVoteAction(formData: FormData) {
       user_id: user.id,
     });
   }
+
+  await syncIdeaUpvoteCount(ideaId);
 
   revalidatePath("/home");
   revalidatePath("/ideas");

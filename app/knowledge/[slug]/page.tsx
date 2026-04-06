@@ -68,9 +68,9 @@ export default async function KnowledgeArticlePage({
     article.track === "external" ? getExternalResourceBrief(article) : null;
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
+    <div className="grid gap-5 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
       <article className="min-w-0 space-y-6">
-        <header className="hero-surface overflow-hidden rounded-[1.8rem] px-5 py-5 shadow-[0_20px_44px_rgba(37,31,74,0.14)] md:px-6 md:py-6">
+        <header className="hero-surface overflow-hidden rounded-[1.7rem] px-4 py-4 shadow-[0_20px_44px_rgba(37,31,74,0.14)] sm:rounded-[1.8rem] sm:px-5 sm:py-5 md:px-6 md:py-6">
           <div className="relative z-10 space-y-4">
             <Link
               href={backHref}
@@ -96,7 +96,7 @@ export default async function KnowledgeArticlePage({
             </div>
 
             <div className="space-y-3">
-              <h1 className="max-w-3xl text-[clamp(1.4rem,1.9vw,1.95rem)] font-extrabold leading-[1.16] tracking-[-0.04em] text-white">
+              <h1 className="max-w-3xl text-[clamp(1.24rem,1.75vw,1.75rem)] font-extrabold leading-[1.16] tracking-[-0.04em] text-white">
                 {article.title}
               </h1>
               <p className="max-w-2xl text-[12px] leading-5 text-white/78">
@@ -107,7 +107,7 @@ export default async function KnowledgeArticlePage({
         </header>
 
         {externalBrief ? (
-          <section className="rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_26px_rgba(37,31,74,0.04)]">
+          <section className="rounded-[1.5rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_12px_26px_rgba(37,31,74,0.04)] sm:rounded-[1.6rem] sm:px-5 sm:py-5">
             <div className="grid gap-4 md:grid-cols-[1.15fr_0.85fr]">
               <div className="space-y-3">
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary/52">
@@ -151,14 +151,14 @@ export default async function KnowledgeArticlePage({
           </section>
         ) : null}
 
-        <div className="rounded-[1.8rem] border border-[rgba(121,118,127,0.08)] bg-white px-6 py-6 shadow-[0_16px_34px_rgba(37,31,74,0.05)] md:px-7 md:py-7">
+        <div className="rounded-[1.7rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_16px_34px_rgba(37,31,74,0.05)] sm:rounded-[1.8rem] sm:px-6 sm:py-6 md:px-7 md:py-7">
           <KnowledgeMarkdown content={article.contentMd} />
         </div>
       </article>
 
       <aside className="space-y-4">
         <div className="sticky top-24 space-y-4">
-          <div className="surface-subtle rounded-[1.8rem] px-5 py-5">
+          <div className="surface-subtle rounded-[1.7rem] px-4 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-5">
             <p className="text-sm font-semibold text-foreground">문서 정보</p>
             <dl className="mt-4 space-y-4 text-[13px]">
               <div className="space-y-1">
@@ -196,7 +196,7 @@ export default async function KnowledgeArticlePage({
             </dl>
           </div>
 
-          <div className="surface-subtle rounded-[1.8rem] px-5 py-5">
+          <div className="surface-subtle rounded-[1.7rem] px-4 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-5">
             <p className="text-sm font-semibold text-foreground">관련 태그</p>
             {tags.length > 0 ? (
               <div className="mt-4 flex flex-wrap gap-2">
@@ -217,7 +217,7 @@ export default async function KnowledgeArticlePage({
           </div>
 
           {externalTaxonomy ? (
-            <div className="surface-subtle rounded-[1.8rem] px-5 py-5">
+            <div className="surface-subtle rounded-[1.7rem] px-4 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-5">
               <p className="text-sm font-semibold text-foreground">외부 리소스 분류</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-3 py-1 text-xs text-muted-foreground">
@@ -239,7 +239,7 @@ export default async function KnowledgeArticlePage({
           ) : null}
 
           {article.resourceUrl ? (
-            <div className="panel-accent rounded-[1.8rem] px-5 py-5">
+            <div className="panel-accent rounded-[1.7rem] px-4 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-5">
               <p className="text-lg font-bold tracking-[-0.03em]">원문 리소스</p>
               <p className="mt-2 text-sm leading-6 text-white/76">
                 핵심은 이 페이지에서 먼저 파악하고, 세부 명령어·버전·예시는 원문에서 최종 확인하면 좋습니다.
@@ -257,7 +257,7 @@ export default async function KnowledgeArticlePage({
             </div>
           ) : null}
 
-          <div className="surface-subtle rounded-[1.8rem] px-5 py-5">
+          <div className="surface-subtle rounded-[1.7rem] px-4 py-4 sm:rounded-[1.8rem] sm:px-5 sm:py-5">
             <p className="text-sm font-semibold text-foreground">다음으로 보기</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               같은 트랙의 다른 문서를 이어 보면 개념 흐름을 더 자연스럽게 연결할 수 있습니다.

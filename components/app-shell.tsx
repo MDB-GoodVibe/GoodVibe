@@ -169,11 +169,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen">
-      <div className="section-shell py-4 md:py-6">
-        <div className="grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="section-shell py-3 sm:py-4 md:py-6">
+        <div className="grid gap-3 sm:gap-4 xl:grid-cols-[280px_minmax(0,1fr)]">
           <aside
             className={cn(
-              "glass-panel shadow-soft fixed inset-y-4 left-4 z-50 w-[min(280px,calc(100vw-2rem))] rounded-[2rem] border border-[#b8b8d1]/35 p-4 transition xl:static xl:w-auto",
+              "glass-panel shadow-soft fixed inset-y-3 left-2 z-50 w-[min(280px,calc(100vw-1rem))] rounded-[1.8rem] border border-[#b8b8d1]/35 p-3.5 transition sm:inset-y-4 sm:left-4 sm:w-[min(280px,calc(100vw-2rem))] sm:p-4 xl:static xl:w-auto xl:rounded-[2rem]",
               isMenuOpen ? "translate-x-0" : "-translate-x-[110%] xl:translate-x-0",
             )}
           >
@@ -298,7 +298,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </aside>
 
           <div className="space-y-4">
-            <header className="glass-panel shadow-soft rounded-[2rem] border border-[#b8b8d1]/35 px-4 py-4 sm:px-6">
+            <header className="glass-panel shadow-soft rounded-[1.8rem] border border-[#b8b8d1]/35 px-4 py-4 sm:rounded-[2rem] sm:px-5 md:px-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Button
@@ -314,43 +314,45 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </p>
                 </div>
 
-                <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
+                <h1 className="text-lg font-semibold text-foreground sm:text-xl">
                   {getSectionTitle(pathname, currentItem.section)}
                 </h1>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  {headerSubNav.map((item) => {
-                    const isActive = isActivePath(pathname, item.href);
+                <div className="-mx-1 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="flex min-w-max items-center gap-2 px-1">
+                    {headerSubNav.map((item) => {
+                      const isActive = isActivePath(pathname, item.href);
 
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                          "inline-flex items-center gap-3 rounded-full border px-4 py-2 text-sm transition",
-                          isActive
-                            ? "border-primary/30 bg-primary text-primary-foreground"
-                            : "border-[#b8b8d1]/45 bg-[#fffffb]/72 text-muted-foreground hover:border-accent/35 hover:text-foreground",
-                        )}
-                      >
-                        {item.number ? (
-                          <span
-                            className={cn(
-                              "inline-flex size-6 items-center justify-center rounded-full text-xs font-semibold",
-                              isActive
-                                ? "bg-[#fffffb]/16 text-primary-foreground"
-                                : item.complete
-                                  ? "bg-[#ffc145]/35 text-foreground"
-                                  : "bg-[#b8b8d1]/22 text-muted-foreground",
-                            )}
-                          >
-                            {item.number}
-                          </span>
-                        ) : null}
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={cn(
+                            "inline-flex items-center gap-2.5 rounded-full border px-3.5 py-2 text-[13px] transition sm:gap-3 sm:px-4 sm:text-sm",
+                            isActive
+                              ? "border-primary/30 bg-primary text-primary-foreground"
+                              : "border-[#b8b8d1]/45 bg-[#fffffb]/72 text-muted-foreground hover:border-accent/35 hover:text-foreground",
+                          )}
+                        >
+                          {item.number ? (
+                            <span
+                              className={cn(
+                                "inline-flex size-5 items-center justify-center rounded-full text-[11px] font-semibold sm:size-6 sm:text-xs",
+                                isActive
+                                  ? "bg-[#fffffb]/16 text-primary-foreground"
+                                  : item.complete
+                                    ? "bg-[#ffc145]/35 text-foreground"
+                                    : "bg-[#b8b8d1]/22 text-muted-foreground",
+                              )}
+                            >
+                              {item.number}
+                            </span>
+                          ) : null}
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </header>

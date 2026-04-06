@@ -76,7 +76,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Button asChild variant="ghost" className="w-fit">
           <Link href={backHref}>
@@ -93,7 +93,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
               <p className="text-xs uppercase tracking-[0.24em] text-primary">
                 {project.serviceTypeLabel}
               </p>
-              <CardTitle className="text-xl">{project.title}</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">{project.title}</CardTitle>
             </div>
             <span className="rounded-full border border-[#b8b8d1]/45 bg-[#fffffb]/72 px-3 py-1 text-xs text-muted-foreground">
               {statusLabelMap[project.status]}
@@ -104,17 +104,19 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
         </CardHeader>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-5 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <Card className="glass-panel rounded-[2rem] border-[#b8b8d1]/35">
           <CardHeader className="space-y-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList>
+              <div className="-mx-1 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <TabsList className="min-w-max">
                 <TabsTrigger value="architecture">구조</TabsTrigger>
                 <TabsTrigger value="prompts">프롬프트</TabsTrigger>
-              </TabsList>
+                </TabsList>
+              </div>
 
               <TabsContent value="architecture" className="mt-5 space-y-4">
-                <div className="flex flex-wrap gap-2">
+                <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
                   {project.architecture.highlights.map((item) => (
                     <span
                       key={item.label}
@@ -129,14 +131,14 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
               </TabsContent>
 
               <TabsContent value="prompts" className="mt-5 space-y-4">
-                <div className="flex flex-wrap gap-2">
+                <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
                   {project.promptStages.map((stage) => (
                     <button
                       key={stage.stage}
                       type="button"
                       onClick={() => setActivePromptStage(stage.stage)}
                       className={cn(
-                        "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm transition",
+                        "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm transition",
                         activePromptStage === stage.stage
                           ? "border-primary/30 bg-primary text-primary-foreground"
                           : "border-[#b8b8d1]/35 bg-[#fffffb]/72 text-muted-foreground hover:border-accent/35",

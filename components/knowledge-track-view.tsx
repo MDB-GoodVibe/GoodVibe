@@ -74,18 +74,18 @@ export function KnowledgeTrackView({
   const featuredCount = articles.filter((article) => article.featured).length;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <section
-        className={`rounded-[2rem] border border-[rgba(121,118,127,0.08)] px-7 py-7 shadow-[0_14px_30px_rgba(37,31,74,0.05)] ${meta.surfaceClass}`}
+        className={`rounded-[1.8rem] border border-[rgba(121,118,127,0.08)] px-5 py-5 shadow-[0_14px_30px_rgba(37,31,74,0.05)] sm:rounded-[2rem] sm:px-6 sm:py-6 md:px-7 md:py-7 ${meta.surfaceClass}`}
       >
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-3">
             <span
               className={`inline-flex rounded-full px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] ${meta.accentClass}`}
             >
               {meta.kicker}
             </span>
-            <h1 className="text-[clamp(1.35rem,1.9vw,1.75rem)] font-extrabold tracking-[-0.04em] text-primary">
+            <h1 className="text-[clamp(1.22rem,1.7vw,1.55rem)] font-extrabold tracking-[-0.04em] text-primary">
               {title}
             </h1>
             <p className="max-w-3xl text-[13px] leading-6 text-muted-foreground sm:text-sm">
@@ -93,14 +93,14 @@ export function KnowledgeTrackView({
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="min-w-[150px] rounded-[1.4rem] border border-[rgba(121,118,127,0.08)] bg-white/88 px-5 py-4 shadow-[0_10px_24px_rgba(37,31,74,0.04)]">
+          <div className="grid gap-2 sm:grid-cols-2 sm:gap-3">
+            <div className="min-w-0 rounded-[1.25rem] border border-[rgba(121,118,127,0.08)] bg-white/88 px-4 py-3.5 shadow-[0_10px_24px_rgba(37,31,74,0.04)] sm:rounded-[1.4rem] sm:px-5 sm:py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="whitespace-nowrap text-[11px] font-semibold tracking-[0.18em] text-primary/55">
                     전체 문서
                   </p>
-                  <p className="mt-3 text-2xl font-extrabold tracking-[-0.05em] text-primary">
+                  <p className="mt-3 text-[1.65rem] font-extrabold tracking-[-0.05em] text-primary sm:text-2xl">
                     {articles.length}
                   </p>
                 </div>
@@ -109,13 +109,13 @@ export function KnowledgeTrackView({
                 </span>
               </div>
             </div>
-            <div className="min-w-[150px] rounded-[1.4rem] border border-[rgba(121,118,127,0.08)] bg-white/88 px-5 py-4 shadow-[0_10px_24px_rgba(37,31,74,0.04)]">
+            <div className="min-w-0 rounded-[1.25rem] border border-[rgba(121,118,127,0.08)] bg-white/88 px-4 py-3.5 shadow-[0_10px_24px_rgba(37,31,74,0.04)] sm:rounded-[1.4rem] sm:px-5 sm:py-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="whitespace-nowrap text-[11px] font-semibold tracking-[0.18em] text-primary/55">
                     추천 문서
                   </p>
-                  <p className="mt-3 text-2xl font-extrabold tracking-[-0.05em] text-primary">
+                  <p className="mt-3 text-[1.65rem] font-extrabold tracking-[-0.05em] text-primary sm:text-2xl">
                     {featuredCount}
                   </p>
                 </div>
@@ -129,12 +129,12 @@ export function KnowledgeTrackView({
       </section>
 
       {articles.length ? (
-        <section className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
+        <section className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
           {articles.map((article) => (
             <Link
               key={article.id}
               href={`/knowledge/${article.slug}`}
-              className="group flex min-h-[260px] flex-col rounded-[1.8rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_14px_28px_rgba(37,31,74,0.05)] transition duration-200 hover:-translate-y-0.5"
+              className="group flex min-h-[230px] flex-col rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_14px_28px_rgba(37,31,74,0.05)] transition duration-200 hover:-translate-y-0.5 sm:rounded-[1.8rem] sm:px-5 sm:py-5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-wrap gap-2">
@@ -154,7 +154,7 @@ export function KnowledgeTrackView({
               </div>
 
               <div className="mt-5 flex-1 space-y-3">
-                <h2 className="text-[1.05rem] font-extrabold leading-[1.28] tracking-[-0.03em] text-primary">
+                <h2 className="text-base font-extrabold leading-[1.28] tracking-[-0.03em] text-primary sm:text-[1.05rem]">
                   {article.title}
                 </h2>
                 <p className="line-clamp-4 text-[13px] leading-6 text-muted-foreground">
@@ -187,7 +187,7 @@ export function KnowledgeTrackView({
           ))}
         </section>
       ) : (
-        <section className="rounded-[1.8rem] border border-[rgba(121,118,127,0.08)] bg-white px-6 py-10 text-center shadow-[0_12px_24px_rgba(37,31,74,0.05)]">
+        <section className="rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-8 text-center shadow-[0_12px_24px_rgba(37,31,74,0.05)] sm:rounded-[1.8rem] sm:px-6 sm:py-10">
           <p className="text-base font-semibold text-primary">아직 등록된 문서가 없습니다.</p>
           <p className="mt-2 text-sm text-muted-foreground">
             같은 카테고리의 문서를 준비하고 있으니 조금만 기다려 주세요.
