@@ -1,3 +1,5 @@
+import { buildExternalResourceSeedSections } from "@/lib/knowledge/external-resource-brief";
+import { classifyExternalResource } from "@/lib/knowledge/external-resource";
 import type { KnowledgeArticle, KnowledgeTrack } from "@/types/good-vibe";
 
 type ArticleSection = {
@@ -44,13 +46,37 @@ function createMarkdown(sections: ArticleSection[]) {
 
 function createArticle(index: number, input: ArticleSeedInput): KnowledgeArticle {
   const publishedAt = createTimestamp(index);
+  const externalTaxonomy =
+    input.track === "external" || input.resourceUrl
+      ? classifyExternalResource({
+          url: input.resourceUrl,
+          title: input.title,
+          summary: input.summary,
+          platformTags: input.platformTags ?? [],
+          toolTags: input.toolTags ?? [],
+        })
+      : null;
+  const sections =
+    input.track === "external"
+      ? [
+          ...input.sections,
+          ...buildExternalResourceSeedSections({
+            title: input.title,
+            summary: input.summary,
+            platformTags: input.platformTags ?? [],
+            toolTags: input.toolTags ?? [],
+            resourceUrl: input.resourceUrl ?? null,
+            taxonomy: externalTaxonomy,
+          }),
+        ]
+      : input.sections;
 
   return {
     id: `knowledge-${input.slug}`,
     slug: input.slug,
     title: input.title,
     summary: input.summary,
-    contentMd: createMarkdown(input.sections),
+    contentMd: createMarkdown(sections),
     track: input.track,
     topic: input.topic,
     status: "published",
@@ -62,6 +88,7 @@ function createArticle(index: number, input: ArticleSeedInput): KnowledgeArticle
     publishedAt,
     createdAt: publishedAt,
     updatedAt: publishedAt,
+    externalTaxonomy,
     source: "seed",
   };
 }

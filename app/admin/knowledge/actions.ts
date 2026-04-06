@@ -8,6 +8,7 @@ import {
   normalizeKnowledgeTrack,
   slugifyKnowledgeTitle,
 } from "@/lib/knowledge/editor";
+import { classifyExternalResource } from "@/lib/knowledge/external-resource";
 import { getCurrentViewer } from "@/lib/auth/viewer";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -100,6 +101,15 @@ export async function generateKnowledgeDraftAction(
   const summaryHint = cleanText(input.summaryHint);
   const details = cleanText(input.details);
   const resourceUrl = cleanText(input.resourceUrl);
+  const resourceTaxonomy =
+    track === "external" || resourceUrl
+      ? classifyExternalResource({
+          url: resourceUrl,
+          title: titleHint,
+          summary: summaryHint,
+          details,
+        })
+      : null;
 
   if (!titleHint && !summaryHint && !details && !resourceUrl) {
     return {
@@ -129,6 +139,7 @@ export async function generateKnowledgeDraftAction(
         summaryHint,
         details,
         resourceUrl: resourceUrl || null,
+        resourceTaxonomy,
         sourceSubmissionId: cleanText(input.sourceSubmissionId ?? "") || null,
       },
     },

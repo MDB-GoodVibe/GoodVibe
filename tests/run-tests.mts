@@ -4,6 +4,7 @@ import {
   parseClaudeMarketplacesFromHtml,
   parseClaudeSkillsFromHtml,
 } from "@/lib/explore/claude-marketplaces";
+import { classifyExternalResource } from "@/lib/knowledge/external-resource";
 import { parseSkillsShList } from "@/lib/explore/skills-sh";
 import {
   createAnalyzedWorkspaceDraft,
@@ -69,6 +70,45 @@ run("parseClaudeMarketplacesFromHtml extracts marketplace payload", () => {
   assert.equal(items.length, 1);
   assert.equal(items[0]?.title, "anthropics/claude-code");
   assert.equal(items[0]?.popularityLabel, "8개 플러그인 / 65.1K 스타");
+});
+
+run("classifyExternalResource infers YouTube AI agent taxonomy", () => {
+  const taxonomy = classifyExternalResource({
+    url: "https://www.youtube.com/watch?v=demo",
+    title: "Claude Code tutorial for beginners",
+    summary: "How to use Claude Code efficiently",
+  });
+
+  assert.ok(taxonomy);
+  assert.equal(taxonomy?.channel, "youtube");
+  assert.equal(taxonomy?.category, "ai-agent");
+  assert.equal(taxonomy?.subcategory, "claude");
+});
+
+run("classifyExternalResource infers docs deploy taxonomy", () => {
+  const taxonomy = classifyExternalResource({
+    url: "https://vercel.com/guides/deploying-nextjs-with-vercel",
+    title: "Deploy Next.js on Vercel",
+    summary: "Deployment guide",
+  });
+
+  assert.ok(taxonomy);
+  assert.equal(taxonomy?.channel, "docs");
+  assert.equal(taxonomy?.category, "deploy");
+  assert.equal(taxonomy?.subcategory, "vercel");
+});
+
+run("classifyExternalResource infers blog database taxonomy", () => {
+  const taxonomy = classifyExternalResource({
+    url: "https://supabase.com/blog/supabase-local-db-workflow",
+    title: "Supabase and local DB workflow",
+    summary: "Using Postgres and SQLite together",
+  });
+
+  assert.ok(taxonomy);
+  assert.equal(taxonomy?.channel, "blog");
+  assert.equal(taxonomy?.category, "database");
+  assert.equal(taxonomy?.subcategory, "supabase");
 });
 
 run("workspace draft hydration recomputes derived artifacts", () => {

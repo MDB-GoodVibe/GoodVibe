@@ -33,6 +33,10 @@ import {
   knowledgeTopicOptions,
   slugifyKnowledgeTitle,
 } from "@/lib/knowledge/editor";
+import {
+  classifyExternalResource,
+  formatExternalTaxonomyPath,
+} from "@/lib/knowledge/external-resource";
 import { cn } from "@/lib/utils";
 import type { KnowledgeEditorMode } from "@/types/admin-knowledge";
 import type { KnowledgeTrack } from "@/types/good-vibe";
@@ -179,6 +183,16 @@ export function KnowledgeEditor({
       "왼쪽 입력 영역에 Markdown 본문을 작성하면 여기에서 실제 지식 문서처럼 렌더링됩니다.",
     ].join("\n");
   }, [deferredContent]);
+  const autoResourceTaxonomy = useMemo(
+    () =>
+      classifyExternalResource({
+        url: resourceUrl,
+        title: titleHint || title,
+        summary: summaryHint || summary,
+        details,
+      }),
+    [details, resourceUrl, summary, summaryHint, title, titleHint],
+  );
 
   function handleTrackChange(value: string) {
     const nextTrack = value as KnowledgeTrack;
@@ -446,6 +460,31 @@ export function KnowledgeEditor({
                 placeholder="https://example.com/article"
               />
             </div>
+
+            {autoResourceTaxonomy ? (
+              <div className="mt-4 rounded-[1.4rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(250,249,249,0.88)] px-4 py-4">
+                <p className="text-[12px] font-extrabold uppercase tracking-[0.18em] text-primary/52">
+                  Auto Classification
+                </p>
+                <p className="mt-2 text-[14px] font-semibold text-primary">
+                  {formatExternalTaxonomyPath(autoResourceTaxonomy)}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-full bg-[rgba(59,53,97,0.08)] px-3 py-1 text-xs font-semibold text-primary">
+                    {autoResourceTaxonomy.sourceName}
+                  </span>
+                  <span className="rounded-full bg-[rgba(255,193,69,0.18)] px-3 py-1 text-xs font-semibold text-primary">
+                    confidence {autoResourceTaxonomy.confidence}
+                  </span>
+                </div>
+                {autoResourceTaxonomy.matchedSignals.length > 0 ? (
+                  <p className="mt-3 text-[13px] leading-6 text-muted-foreground">
+                    URL is used for the channel, and title/summary/details refine the middle and
+                    detailed categories: {autoResourceTaxonomy.matchedSignals.join(", ")}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             {mode === "ai" ? (
               <div className="mt-6 space-y-4 rounded-[1.7rem] bg-[rgba(250,249,249,0.88)] px-5 py-5">

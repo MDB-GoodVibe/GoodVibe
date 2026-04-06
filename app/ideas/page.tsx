@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Search, Sparkles, ThumbsUp } from "lucide-react";
+import { FileText, Plus, Search, Sparkles, ThumbsUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
@@ -43,16 +43,21 @@ export default async function IdeasPage({
               아이디어 보드
             </h1>
             <p className="text-[13px] leading-6 text-muted-foreground">
-              등록된 아이디어를 보고, 투표하고, 바로 헬퍼로 이어갈 수 있습니다.
+              등록된 아이디어를 보고, 추천하고, 바로 헬퍼로 이어갈 수 있습니다.
             </p>
           </div>
 
-          <Button asChild size="sm">
-            <Link href="/ideas/new">
-              <Plus className="size-4" />
-              아이디어 등록
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="sm">
+              <Link href="/ideas/new">
+                <Plus className="size-4" />
+                아이디어 등록
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/ideas/mine">내가 등록한 아이디어</Link>
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -62,7 +67,7 @@ export default async function IdeasPage({
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {[
               ["01", "등록", "생각한 문제나 서비스 아이디어를 올립니다."],
-              ["02", "투표", "공감되는 아이디어를 먼저 골라냅니다."],
+              ["02", "추천", "좋은 아이디어를 먼저 골라냅니다."],
               ["03", "연결", "선택한 아이디어를 헬퍼로 이어갑니다."],
             ].map(([step, title, body]) => (
               <div key={step} className="rounded-[1.2rem] bg-[rgba(244,243,243,0.9)] px-4 py-4">
@@ -85,7 +90,7 @@ export default async function IdeasPage({
         </div>
 
         <div className="rounded-[1.7rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)]">
-          <p className="text-[12px] font-semibold text-muted-foreground">상위 공감 수</p>
+          <p className="text-[12px] font-semibold text-muted-foreground">상위 추천 수</p>
           <p className="mt-3 text-[2rem] font-bold tracking-[-0.05em] text-primary">{topVoted}</p>
           <p className="mt-1 text-[13px] text-muted-foreground">상위 3개 아이디어 합계</p>
         </div>
@@ -118,7 +123,7 @@ export default async function IdeasPage({
             </Button>
             <Button asChild size="sm" variant={sort === "popular" ? "secondary" : "ghost"}>
               <Link href={query ? `/ideas?sort=popular&q=${encodeURIComponent(query)}` : "/ideas?sort=popular"}>
-                투표순
+                추천순
               </Link>
             </Button>
           </div>
@@ -150,6 +155,13 @@ export default async function IdeasPage({
                 <p className="line-clamp-4 text-[13px] leading-6 text-muted-foreground">
                   {idea.content}
                 </p>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2 text-[12px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(244,243,243,0.92)] px-3 py-1">
+                  <FileText className="size-3.5" />
+                  참고 링크 {idea.referenceLinks.length}개
+                </span>
               </div>
 
               <div className="mt-5 flex flex-wrap gap-2">

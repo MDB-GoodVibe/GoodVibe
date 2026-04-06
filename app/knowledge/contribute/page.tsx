@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { Textarea } from "@/components/ui/textarea";
 import { getCurrentViewer } from "@/lib/auth/viewer";
+import { formatExternalTaxonomyPath } from "@/lib/knowledge/external-resource";
 import { listKnowledgeSubmissionsForViewer } from "@/lib/repositories/knowledge-submissions";
 import type {
   KnowledgeSubmissionStatus,
@@ -199,6 +200,11 @@ export default async function KnowledgeContributePage({
                     <p className="mt-2 text-sm leading-7 text-muted-foreground">
                       {submission.summary}
                     </p>
+                    {submission.externalTaxonomy ? (
+                      <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary/52">
+                        {formatExternalTaxonomyPath(submission.externalTaxonomy)}
+                      </p>
+                    ) : null}
                   </div>
                 ))
               ) : (

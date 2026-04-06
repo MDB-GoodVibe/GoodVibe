@@ -1,3 +1,24 @@
+export type ExternalResourceChannel =
+  | "youtube"
+  | "blog"
+  | "x"
+  | "threads"
+  | "news"
+  | "github"
+  | "docs"
+  | "community"
+  | "other";
+export type ExternalResourceCategory =
+  | "ai-agent"
+  | "deploy"
+  | "database"
+  | "web"
+  | "automation"
+  | "backend"
+  | "design"
+  | "productivity"
+  | "general";
+export type ExternalResourceConfidence = "high" | "medium" | "low";
 export type ViewerRole = "user" | "admin";
 export type IdeaPostStatus = "published" | "hidden";
 export type IdeaSort = "latest" | "popular";
@@ -17,10 +38,25 @@ export interface ViewerProfile {
   role: ViewerRole;
 }
 
+export interface ExternalResourceTaxonomy {
+  channel: ExternalResourceChannel;
+  channelLabel: string;
+  category: ExternalResourceCategory;
+  categoryLabel: string;
+  subcategory: string;
+  subcategoryLabel: string;
+  sourceName: string;
+  domain: string;
+  autoClassified: boolean;
+  confidence: ExternalResourceConfidence;
+  matchedSignals: string[];
+}
+
 export interface IdeaPost {
   id: string;
   title: string;
   content: string;
+  referenceLinks: string[];
   authorId: string;
   authorName: string;
   status: IdeaPostStatus;
@@ -48,6 +84,7 @@ export interface KnowledgeArticle {
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  externalTaxonomy: ExternalResourceTaxonomy | null;
   source: "seed" | "supabase";
 }
 
@@ -63,5 +100,6 @@ export interface KnowledgeSubmission {
   status: KnowledgeSubmissionStatus;
   createdAt: string;
   updatedAt: string;
+  externalTaxonomy: ExternalResourceTaxonomy | null;
   source: "supabase";
 }

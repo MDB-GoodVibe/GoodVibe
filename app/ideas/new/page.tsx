@@ -3,12 +3,11 @@ import { redirect } from "next/navigation";
 
 import { createIdeaPostAction } from "@/app/ideas/actions";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { IdeaFormFields } from "@/components/ideas/idea-form-fields";
 import { FormPendingOverlay } from "@/components/ui/form-pending-overlay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
-import { Textarea } from "@/components/ui/textarea";
 import { getCurrentViewer } from "@/lib/auth/viewer";
 
 export default async function NewIdeaPage({
@@ -45,40 +44,18 @@ export default async function NewIdeaPage({
             <CardHeader className="space-y-3">
               <CardTitle className="text-3xl">아이디어 등록</CardTitle>
               <p className="text-sm leading-7 text-muted-foreground">
-                제목과 내용을 적으면 다른 사용자가 보고 공감하거나 투표할 수 있습니다.
+                모든 회원이 아이디어를 등록할 수 있고, 등록한 글은 본인만 수정할 수 있습니다.
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
               <form action={createIdeaPostAction} className="relative space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground" htmlFor="title">
-                    제목
-                  </label>
-                  <Input
-                    id="title"
-                    name="title"
-                    placeholder="예: 작업 공지와 자료를 한 번에 관리하는 보드"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground" htmlFor="content">
-                    내용
-                  </label>
-                  <Textarea
-                    id="content"
-                    name="content"
-                    className="min-h-56"
-                    placeholder="왜 필요한지, 어떤 문제가 있는지, 어떤 결과를 기대하는지 문단으로 적어 주세요."
-                    required
-                  />
-                </div>
+                <IdeaFormFields />
 
                 {params.error ? (
                   <p className="text-sm text-accent">
-                    저장하지 못했습니다. Supabase 테이블이 아직 준비되지 않았거나 입력값이 비어
-                    있을 수 있습니다.
+                    {params.error === "invalid-links"
+                      ? "참고 링크는 http 또는 https 형식의 올바른 주소만 입력할 수 있습니다."
+                      : "저장하지 못했습니다. Supabase 테이블이 아직 준비되지 않았거나 입력값이 비어 있을 수 있습니다."}
                   </p>
                 ) : null}
 
