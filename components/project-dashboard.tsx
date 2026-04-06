@@ -50,7 +50,7 @@ export function ProjectDashboard({
             <p className="inline-flex rounded-full bg-white/12 px-4 py-1 text-[11px] font-extrabold uppercase tracking-[0.24em] text-white/82">
               Projects
             </p>
-            <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.05] tracking-[-0.07em] text-white sm:text-5xl">
+            <h1 className="max-w-3xl text-2xl font-extrabold leading-[1.08] tracking-[-0.05em] text-white sm:text-3xl">
               {view === "saved" ? "저장된 프로젝트" : "진행 중인 프로젝트"}
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
@@ -103,7 +103,7 @@ export function ProjectDashboard({
                       {statusLabelMap[project.status]}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-extrabold tracking-[-0.04em] text-primary">
+                  <h2 className="text-xl font-extrabold tracking-[-0.03em] text-primary">
                     {project.title}
                   </h2>
                   <p className="line-clamp-2 max-w-3xl text-sm leading-7 text-muted-foreground">

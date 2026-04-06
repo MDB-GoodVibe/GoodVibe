@@ -70,7 +70,7 @@ export default async function KnowledgeArticlePage({
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
       <article className="min-w-0 space-y-6">
-        <header className="hero-surface overflow-hidden rounded-[1.9rem] px-6 py-6 shadow-[0_22px_52px_rgba(37,31,74,0.14)] md:px-7 md:py-7">
+        <header className="hero-surface overflow-hidden rounded-[1.8rem] px-5 py-5 shadow-[0_20px_44px_rgba(37,31,74,0.14)] md:px-6 md:py-6">
           <div className="relative z-10 space-y-4">
             <Link
               href={backHref}
@@ -96,10 +96,10 @@ export default async function KnowledgeArticlePage({
             </div>
 
             <div className="space-y-3">
-              <h1 className="max-w-3xl text-[clamp(1.7rem,2.4vw,2.55rem)] font-extrabold leading-[1.12] tracking-[-0.05em] text-white">
+              <h1 className="max-w-3xl text-[clamp(1.4rem,1.9vw,1.95rem)] font-extrabold leading-[1.16] tracking-[-0.04em] text-white">
                 {article.title}
               </h1>
-              <p className="max-w-2xl text-[13px] leading-6 text-white/78">
+              <p className="max-w-2xl text-[12px] leading-5 text-white/78">
                 {article.summary}
               </p>
             </div>

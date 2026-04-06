@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  ExternalLink,
+  SlidersHorizontal,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {
@@ -98,24 +103,28 @@ function FilterChipGroup({
   value,
   options,
   onChange,
+  compact = false,
+  showSelectedLabel = true,
 }: {
   label: string;
   kind: FilterKind;
   value: string;
   options: FilterOption[];
   onChange: (value: string) => void;
+  compact?: boolean;
+  showSelectedLabel?: boolean;
 }) {
   const totalCount = options.reduce((sum, option) => sum + option.count, 0);
   const selectedOption = options.find((option) => option.value === value);
   const items = [{ value: "all", label: "전체", count: totalCount }, ...options];
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary/55">
+        <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-primary/50">
           {label}
         </span>
-        {selectedOption ? (
+        {showSelectedLabel && selectedOption && selectedOption.value !== "all" ? (
           <span className="text-xs font-medium text-muted-foreground">
             {selectedOption.label}
           </span>
@@ -133,7 +142,8 @@ function FilterChipGroup({
               type="button"
               onClick={() => onChange(option.value)}
               className={cn(
-                "inline-flex h-10 items-center gap-2 rounded-full border px-3.5 text-sm font-semibold transition",
+                "inline-flex items-center gap-2 rounded-full border font-semibold transition",
+                compact ? "h-9 px-3 text-[13px]" : "h-10 px-3.5 text-sm",
                 selected
                   ? "border-primary bg-primary text-white shadow-[0_10px_20px_rgba(37,31,74,0.18)]"
                   : "border-[rgba(121,118,127,0.12)] bg-white text-primary hover:border-[rgba(59,53,97,0.25)] hover:bg-[rgba(249,247,255,0.85)]",
@@ -142,13 +152,17 @@ function FilterChipGroup({
               <BrandIcon
                 icon={icon}
                 size={14}
-                bubbleClassName={selected ? "bg-white text-primary" : "bg-[rgba(244,243,243,0.96)]"}
+                bubbleClassName={
+                  selected ? "bg-white text-primary" : "bg-[rgba(244,243,243,0.96)]"
+                }
               />
               <span>{option.label}</span>
               <span
                 className={cn(
-                  "rounded-full px-2 py-0.5 text-[11px] font-bold",
-                  selected ? "bg-white/18 text-white" : "bg-[rgba(59,53,97,0.08)] text-primary/70",
+                  "rounded-full px-2 py-0.5 text-[10px] font-bold",
+                  selected
+                    ? "bg-white/18 text-white"
+                    : "bg-[rgba(59,53,97,0.08)] text-primary/70",
                 )}
               >
                 {option.count}
@@ -221,6 +235,7 @@ export function KnowledgeExternalTrackView({
   const [selectedChannel, setSelectedChannel] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const channelOptions = useMemo(
     () =>
@@ -236,7 +251,8 @@ export function KnowledgeExternalTrackView({
   const categorySource = useMemo(
     () =>
       items.filter(
-        ({ taxonomy }) => selectedChannel === "all" || taxonomy.channel === selectedChannel,
+        ({ taxonomy }) =>
+          selectedChannel === "all" || taxonomy.channel === selectedChannel,
       ),
     [items, selectedChannel],
   );
@@ -255,7 +271,8 @@ export function KnowledgeExternalTrackView({
   const subcategorySource = useMemo(
     () =>
       categorySource.filter(
-        ({ taxonomy }) => selectedCategory === "all" || taxonomy.category === selectedCategory,
+        ({ taxonomy }) =>
+          selectedCategory === "all" || taxonomy.category === selectedCategory,
       ),
     [categorySource, selectedCategory],
   );
@@ -275,10 +292,21 @@ export function KnowledgeExternalTrackView({
     () =>
       subcategorySource.filter(
         ({ taxonomy }) =>
-          selectedSubcategory === "all" || taxonomy.subcategory === selectedSubcategory,
+          selectedSubcategory === "all" ||
+          taxonomy.subcategory === selectedSubcategory,
       ),
     [selectedSubcategory, subcategorySource],
   );
+
+  const hasAdvancedSelection =
+    selectedCategory !== "all" || selectedSubcategory !== "all";
+  const hasActiveFilters = selectedChannel !== "all" || hasAdvancedSelection;
+  const selectedCategoryLabel =
+    categoryOptions.find((option) => option.value === selectedCategory)?.label ??
+    null;
+  const selectedSubcategoryLabel =
+    subcategoryOptions.find((option) => option.value === selectedSubcategory)
+      ?.label ?? null;
 
   function handleChannelChange(value: string) {
     setSelectedChannel(value);
@@ -289,71 +317,126 @@ export function KnowledgeExternalTrackView({
   function handleCategoryChange(value: string) {
     setSelectedCategory(value);
     setSelectedSubcategory("all");
+
+    if (value !== "all") {
+      setShowAdvancedFilters(true);
+    }
+  }
+
+  function handleSubcategoryChange(value: string) {
+    setSelectedSubcategory(value);
+
+    if (value !== "all") {
+      setShowAdvancedFilters(true);
+    }
   }
 
   function resetFilters() {
     setSelectedChannel("all");
     setSelectedCategory("all");
     setSelectedSubcategory("all");
+    setShowAdvancedFilters(false);
   }
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[2rem] border border-[rgba(121,118,127,0.08)] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(250,247,239,0.96))] px-6 py-6 shadow-[0_14px_30px_rgba(37,31,74,0.05)]">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-3">
+      <section className="rounded-[1.8rem] border border-[rgba(121,118,127,0.08)] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(250,247,239,0.96))] px-5 py-5 shadow-[0_14px_30px_rgba(37,31,74,0.05)]">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-2">
             <span className="inline-flex rounded-full bg-[rgba(255,193,69,0.18)] px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.2em] text-primary">
               Resources
             </span>
-            <h1 className="text-[clamp(1.6rem,2.4vw,2.2rem)] font-extrabold tracking-[-0.05em] text-primary">
+            <h1 className="text-[clamp(1.2rem,1.6vw,1.5rem)] font-extrabold tracking-[-0.03em] text-primary">
               {title}
             </h1>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-sm">
-            <span className="rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-4 py-2 font-semibold text-primary">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span className="rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-3.5 py-2 font-semibold text-primary">
               리소스 {filteredItems.length}
             </span>
-            <span className="rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-4 py-2 font-semibold text-primary">
+            <span className="rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-3.5 py-2 font-semibold text-primary">
               채널 {channelOptions.length}
             </span>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-9 rounded-full px-3.5"
+              onClick={() => setShowAdvancedFilters((current) => !current)}
+            >
+              <SlidersHorizontal className="size-3.5" />
+              {showAdvancedFilters ? "필터 접기" : "필터 더보기"}
+              <ChevronDown
+                className={cn(
+                  "size-3.5 transition-transform",
+                  showAdvancedFilters ? "rotate-180" : "rotate-0",
+                )}
+              />
+            </Button>
+            {hasActiveFilters ? (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex h-9 items-center rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-3.5 text-sm font-semibold text-primary transition hover:border-[rgba(59,53,97,0.22)] hover:bg-[rgba(249,247,255,0.85)]"
+              >
+                초기화
+              </button>
+            ) : null}
           </div>
         </div>
 
-        <div className="mt-5 space-y-4">
+        <div className="mt-4 space-y-3">
           <FilterChipGroup
             label="채널"
             kind="channel"
             value={selectedChannel}
             options={channelOptions}
             onChange={handleChannelChange}
+            compact
+            showSelectedLabel={false}
           />
-          <FilterChipGroup
-            label="주제"
-            kind="category"
-            value={selectedCategory}
-            options={categoryOptions}
-            onChange={handleCategoryChange}
-          />
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div className="flex-1">
-              <FilterChipGroup
-                label="도구"
-                kind="subcategory"
-                value={selectedSubcategory}
-                options={subcategoryOptions}
-                onChange={setSelectedSubcategory}
-              />
+
+          {!showAdvancedFilters && hasAdvancedSelection ? (
+            <div className="flex flex-wrap gap-2">
+              {selectedCategoryLabel ? (
+                <TaxonomyPill
+                  icon={getCategoryIcon(selectedCategory)}
+                  label={`주제 ${selectedCategoryLabel}`}
+                  tone="category"
+                />
+              ) : null}
+              {selectedSubcategoryLabel ? (
+                <TaxonomyPill
+                  icon={getSubcategoryIcon(selectedSubcategory)}
+                  label={`도구 ${selectedSubcategoryLabel}`}
+                  tone="subcategory"
+                />
+              ) : null}
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-10 rounded-full px-4"
-              onClick={resetFilters}
-            >
-              필터 초기화
-            </Button>
-          </div>
+          ) : null}
+
+          {showAdvancedFilters ? (
+            <div className="rounded-[1.4rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(250,249,249,0.78)] px-4 py-4">
+              <div className="space-y-4">
+                <FilterChipGroup
+                  label="주제"
+                  kind="category"
+                  value={selectedCategory}
+                  options={categoryOptions}
+                  onChange={handleCategoryChange}
+                  compact
+                />
+                <FilterChipGroup
+                  label="도구"
+                  kind="subcategory"
+                  value={selectedSubcategory}
+                  options={subcategoryOptions}
+                  onChange={handleSubcategoryChange}
+                  compact
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -396,7 +479,7 @@ export function KnowledgeExternalTrackView({
                 </div>
 
                 <div className="mt-5 flex-1 space-y-3">
-                  <h2 className="text-[1.2rem] font-extrabold leading-[1.24] tracking-[-0.04em] text-primary">
+                  <h2 className="text-[1.05rem] font-extrabold leading-[1.28] tracking-[-0.03em] text-primary">
                     {article.title}
                   </h2>
                   <p className="text-[13px] leading-6 text-muted-foreground">
@@ -430,7 +513,11 @@ export function KnowledgeExternalTrackView({
                   </Button>
                   {article.resourceUrl ? (
                     <Button asChild variant="secondary" size="sm">
-                      <Link href={article.resourceUrl} target="_blank" rel="noreferrer">
+                      <Link
+                        href={article.resourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         원문
                         <ExternalLink className="size-4" />
                       </Link>

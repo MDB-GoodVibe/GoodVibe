@@ -28,7 +28,7 @@ export default async function NewIdeaPage({
         {!viewer ? (
           <Card className="glass-panel rounded-[2rem] border-[#b8b8d1]/35">
             <CardHeader className="space-y-3">
-              <CardTitle className="text-3xl">
+              <CardTitle className="text-xl">
                 아이디어를 등록하려면 로그인해 주세요
               </CardTitle>
             </CardHeader>
@@ -42,7 +42,7 @@ export default async function NewIdeaPage({
         ) : (
           <Card className="glass-panel rounded-[2rem] border-[#b8b8d1]/35">
             <CardHeader className="space-y-3">
-              <CardTitle className="text-3xl">아이디어 등록</CardTitle>
+              <CardTitle className="text-xl">아이디어 등록</CardTitle>
               <p className="text-sm leading-7 text-muted-foreground">
                 모든 회원이 아이디어를 등록할 수 있고, 등록한 글은 본인만 수정할 수 있습니다.
               </p>

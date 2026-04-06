@@ -126,7 +126,7 @@ export function SkillExplorer() {
               <Compass className="size-3.5 text-primary" />
               Project-aware Search
             </div>
-            <h2 className="text-3xl font-semibold tracking-tight text-foreground">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
               지금 프로젝트에 맞는 스킬을
               <br />
               검색하고 추천받을 수 있습니다
@@ -319,7 +319,7 @@ export function SkillExplorer() {
                     <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted-foreground">
                       {selectedSkill.sourceLabel}
                     </span>
-                    <CardTitle className="text-2xl">{selectedSkill.name}</CardTitle>
+                    <CardTitle className="text-xl">{selectedSkill.name}</CardTitle>
                   </div>
                   <div className="inline-flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                     <Package2 className="size-4" />
@@ -386,7 +386,7 @@ export function SkillExplorer() {
               <p className="text-xs uppercase tracking-[0.2em] text-primary">
                 Next Connection
               </p>
-              <CardTitle className="text-xl">다음 확장 포인트</CardTitle>
+              <CardTitle className="text-lg">다음 확장 포인트</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm leading-6 text-muted-foreground">
               <p>공식 카탈로그 원격 조회</p>

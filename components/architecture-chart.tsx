@@ -23,7 +23,7 @@ export function ArchitectureChart() {
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">
               구조 미리보기
             </p>
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-xl">
               방향만 정해도
               <br />
               구조가 바로 보입니다.

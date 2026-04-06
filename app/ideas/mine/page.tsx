@@ -29,7 +29,7 @@ export default async function MyIdeasPage() {
         <div className="mx-auto max-w-2xl">
           <Card className="glass-panel rounded-[2rem] border-[#b8b8d1]/35">
             <CardHeader className="space-y-3">
-              <CardTitle className="text-3xl">내가 등록한 아이디어를 보려면 로그인해 주세요</CardTitle>
+              <CardTitle className="text-xl">내가 등록한 아이디어를 보려면 로그인해 주세요</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm leading-7 text-muted-foreground">
@@ -54,7 +54,7 @@ export default async function MyIdeasPage() {
             <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-secondary">
               My Ideas
             </p>
-            <h1 className="text-[1.7rem] font-bold tracking-[-0.05em] text-primary">
+            <h1 className="text-[1.4rem] font-bold tracking-[-0.04em] text-primary">
               내가 등록한 아이디어
             </h1>
             <p className="text-[13px] leading-6 text-muted-foreground">
@@ -79,13 +79,13 @@ export default async function MyIdeasPage() {
       <section className="grid gap-4 md:grid-cols-2">
         <div className="rounded-[1.7rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)]">
           <p className="text-[12px] font-semibold text-muted-foreground">내 등록 수</p>
-          <p className="mt-3 text-[2rem] font-bold tracking-[-0.05em] text-primary">{ideas.length}</p>
+          <p className="mt-3 text-[1.45rem] font-bold tracking-[-0.04em] text-primary">{ideas.length}</p>
           <p className="mt-1 text-[13px] text-muted-foreground">내 계정으로 등록한 전체 아이디어</p>
         </div>
 
         <div className="rounded-[1.7rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)]">
           <p className="text-[12px] font-semibold text-muted-foreground">누적 추천수</p>
-          <p className="mt-3 text-[2rem] font-bold tracking-[-0.05em] text-primary">{totalVotes}</p>
+          <p className="mt-3 text-[1.45rem] font-bold tracking-[-0.04em] text-primary">{totalVotes}</p>
           <p className="mt-1 text-[13px] text-muted-foreground">내 아이디어에 모인 전체 추천 수</p>
         </div>
       </section>

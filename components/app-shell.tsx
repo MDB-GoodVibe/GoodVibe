@@ -314,7 +314,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </p>
                 </div>
 
-                <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
+                <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
                   {getSectionTitle(pathname, currentItem.section)}
                 </h1>
 

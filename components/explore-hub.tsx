@@ -167,7 +167,7 @@ export function ExploreHub({
             <p className="inline-flex rounded-full bg-white/12 px-4 py-1 text-[11px] font-extrabold uppercase tracking-[0.24em] text-white/82">
               {kind === "skills" ? "Skills" : "Plugins & Marketplaces"}
             </p>
-            <h1 className="text-4xl font-extrabold leading-[1.05] tracking-[-0.07em] text-white sm:text-5xl">
+            <h1 className="text-2xl font-extrabold leading-[1.08] tracking-[-0.05em] text-white sm:text-3xl">
               {kind === "skills" ? "프로젝트에 맞는 스킬 탐색" : "연결할 플러그인과 마켓 탐색"}
             </h1>
             <p className="max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
@@ -314,7 +314,7 @@ export function ExploreHub({
                         {item.popularityLabel}
                       </span>
                     </div>
-                    <h2 className="text-xl font-extrabold tracking-[-0.04em]">
+                    <h2 className="text-lg font-extrabold tracking-[-0.03em]">
                       {item.title}
                     </h2>
                     <p
@@ -357,7 +357,7 @@ export function ExploreHub({
               </div>
 
               <div className="mt-4 space-y-3">
-                <h2 className="text-3xl font-extrabold tracking-[-0.05em] text-primary">
+                <h2 className="text-xl font-extrabold tracking-[-0.04em] text-primary">
                   {selectedItem.title}
                 </h2>
                 <p className="text-sm leading-7 text-muted-foreground">
