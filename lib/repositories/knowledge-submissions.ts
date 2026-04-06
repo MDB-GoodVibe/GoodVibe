@@ -1,5 +1,6 @@
 import "server-only";
 
+import { classifyExternalResource } from "@/lib/knowledge/external-resource";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {
   KnowledgeSubmission,
@@ -59,6 +60,12 @@ function normalizeRow(
     status: normalizeStatus(row.status),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    externalTaxonomy: classifyExternalResource({
+      url: row.resource_url,
+      title: row.title,
+      summary: row.summary,
+      details: row.details,
+    }),
     source: "supabase",
   };
 }

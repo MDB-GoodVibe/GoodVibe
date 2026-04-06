@@ -1,5 +1,6 @@
 import "server-only";
 
+import { classifyExternalResource } from "@/lib/knowledge/external-resource";
 import { seedKnowledgeArticles } from "@/lib/mock/knowledge-library";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { KnowledgeArticle, KnowledgeTrack } from "@/types/good-vibe";
@@ -45,6 +46,16 @@ function normalizeKnowledgeRow(
     publishedAt: row.published_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    externalTaxonomy:
+      row.track === "external" || row.resource_url
+        ? classifyExternalResource({
+            url: row.resource_url,
+            title: row.title,
+            summary: row.summary,
+            platformTags: row.platform_tags ?? [],
+            toolTags: row.tool_tags ?? [],
+          })
+        : null,
     source: "supabase",
   };
 }

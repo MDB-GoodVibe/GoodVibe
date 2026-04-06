@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { getCurrentViewer } from "@/lib/auth/viewer";
+import { formatExternalTaxonomyPath } from "@/lib/knowledge/external-resource";
 import { listKnowledgeSubmissionsForAdmin } from "@/lib/repositories/knowledge-submissions";
 import type { KnowledgeSubmissionStatus, KnowledgeTrack } from "@/types/good-vibe";
 
@@ -94,6 +95,11 @@ export default async function AdminKnowledgeSubmissionsPage() {
                 <p className="mt-2 text-[13px] leading-6 text-muted-foreground">
                   {submission.summary}
                 </p>
+                {submission.externalTaxonomy ? (
+                  <p className="mt-3 text-[11px] font-extrabold uppercase tracking-[0.16em] text-primary/52">
+                    {formatExternalTaxonomyPath(submission.externalTaxonomy)}
+                  </p>
+                ) : null}
 
                 <div className="mt-4 rounded-[1.2rem] bg-[rgba(244,243,243,0.92)] px-4 py-4 text-[13px] leading-6 text-foreground/82">
                   {submission.details}

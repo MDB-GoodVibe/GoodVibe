@@ -164,29 +164,35 @@ export default async function HomeDashboardPage() {
 
       <section className="grid gap-5 xl:grid-cols-[2.1fr_0.9fr] xl:items-stretch">
         <div className="grid gap-4 xl:grid-cols-3">
-          {topIdeas.map((idea, index) => (
-            <Link
-              key={idea.id}
-              href={`/ideas/${idea.id}`}
-              className="rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)] transition hover:-translate-y-0.5"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-secondary">
-                  Top {index + 1}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(244,243,243,0.92)] px-3 py-1 text-xs font-semibold text-primary">
-                  <Lightbulb className="size-3.5" />
-                  {idea.upvoteCount}
-                </span>
-              </div>
-              <h3 className="mt-4 text-xl font-bold tracking-[-0.03em] text-primary">
-                {idea.title}
-              </h3>
-              <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
-                {idea.content}
-              </p>
-            </Link>
-          ))}
+          {topIdeas.length > 0 ? (
+            topIdeas.map((idea, index) => (
+              <Link
+                key={idea.id}
+                href={`/ideas/${idea.id}`}
+                className="rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.05)] transition hover:-translate-y-0.5"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-secondary">
+                    Top {index + 1}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(244,243,243,0.92)] px-3 py-1 text-xs font-semibold text-primary">
+                    <Lightbulb className="size-3.5" />
+                    {idea.upvoteCount}
+                  </span>
+                </div>
+                <h3 className="mt-4 text-xl font-bold tracking-[-0.03em] text-primary">
+                  {idea.title}
+                </h3>
+                <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
+                  {idea.content}
+                </p>
+              </Link>
+            ))
+          ) : (
+            <div className="rounded-[1.6rem] border border-dashed border-[rgba(121,118,127,0.18)] bg-white px-6 py-10 text-center text-sm text-muted-foreground xl:col-span-3">
+              아직 등록된 아이디어가 없습니다.
+            </div>
+          )}
         </div>
 
         <CompactIntro

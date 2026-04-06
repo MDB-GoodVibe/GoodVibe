@@ -1,3 +1,4 @@
+import { classifyExternalResource } from "@/lib/knowledge/external-resource";
 import type { IdeaPost, KnowledgeArticle } from "@/types/good-vibe";
 
 const seedCreatedAt = "2026-03-20T09:00:00.000Z";
@@ -50,7 +51,7 @@ export const seedIdeaPosts: IdeaPost[] = [
   },
 ];
 
-export const seedKnowledgeArticles: KnowledgeArticle[] = [
+const seedKnowledgeArticleEntries = [
   {
     id: "knowledge-basics-vibe-coding",
     slug: "vibe-coding-what-is",
@@ -408,4 +409,18 @@ Good Vibe 레벨업 섹션의 배포 아키텍처 문서와 연결해서 보세�
     updatedAt: "2026-03-24T18:45:00.000Z",
     source: "seed",
   },
-];
+ ] satisfies Array<Omit<KnowledgeArticle, "externalTaxonomy">>;
+
+export const seedKnowledgeArticles: KnowledgeArticle[] = seedKnowledgeArticleEntries.map((article) => ({
+  ...article,
+  externalTaxonomy:
+    article.track === "external" || article.resourceUrl
+      ? classifyExternalResource({
+          url: article.resourceUrl,
+          title: article.title,
+          summary: article.summary,
+          platformTags: article.platformTags,
+          toolTags: article.toolTags,
+        })
+      : null,
+}));
