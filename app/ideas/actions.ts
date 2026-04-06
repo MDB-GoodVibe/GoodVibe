@@ -7,6 +7,7 @@ import {
   collectIdeaReferenceLinks,
   serializeIdeaReferenceLinks,
 } from "@/lib/ideas/reference-links";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function requireIdeaAuthor(
@@ -38,6 +39,35 @@ export type ToggleIdeaVoteState = {
   status: "idle" | "success" | "error";
   redirectTo: string | null;
 };
+
+async function syncIdeaUpvoteCount(ideaId: string) {
+  const admin = createSupabaseAdminClient();
+
+  if (!admin) {
+    return null;
+  }
+
+  const { count, error: countError } = await admin
+    .from("idea_votes")
+    .select("*", { count: "exact", head: true })
+    .eq("idea_id", ideaId);
+
+  if (countError) {
+    return null;
+  }
+
+  const nextCount = count ?? 0;
+  const { error: updateError } = await admin
+    .from("ideas")
+    .update({ upvote_count: nextCount })
+    .eq("id", ideaId);
+
+  if (updateError) {
+    return null;
+  }
+
+  return nextCount;
+}
 
 export async function createIdeaPostAction(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -191,8 +221,14 @@ export async function toggleIdeaVoteAction(
       };
     }
 
+    const syncedCount = await syncIdeaUpvoteCount(ideaId);
+    revalidatePath("/home");
+    revalidatePath("/ideas");
+    revalidatePath("/ideas/mine");
+    revalidatePath(`/ideas/${ideaId}`);
+
     return {
-      count: Math.max(0, previousState.count - 1),
+      count: syncedCount ?? Math.max(0, previousState.count - 1),
       voted: false,
       status: "success" as const,
       redirectTo: null,
@@ -211,8 +247,14 @@ export async function toggleIdeaVoteAction(
     };
   }
 
+  const syncedCount = await syncIdeaUpvoteCount(ideaId);
+  revalidatePath("/home");
+  revalidatePath("/ideas");
+  revalidatePath("/ideas/mine");
+  revalidatePath(`/ideas/${ideaId}`);
+
   return {
-    count: previousState.count + 1,
+    count: syncedCount ?? previousState.count + 1,
     voted: true,
     status: "success" as const,
     redirectTo: null,
