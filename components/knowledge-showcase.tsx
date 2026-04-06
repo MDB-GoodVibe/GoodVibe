@@ -71,7 +71,7 @@ function SectionTitle({
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-center gap-3">
         <span className="h-8 w-1 rounded-full bg-secondary" />
-        <h2 className="text-[clamp(1.8rem,2.8vw,2.6rem)] font-extrabold tracking-[-0.05em] text-primary">
+        <h2 className="text-[clamp(1.22rem,1.8vw,1.55rem)] font-extrabold tracking-[-0.04em] text-primary">
           {title}
         </h2>
       </div>
@@ -106,7 +106,7 @@ export function KnowledgeBasicsShowcase({
           기초 안내 가이드
         </span>
         <div className="space-y-4">
-          <h1 className="max-w-4xl text-[clamp(2.8rem,5vw,4.8rem)] font-extrabold leading-[1.02] tracking-[-0.07em] text-primary">
+          <h1 className="max-w-4xl text-[clamp(1.7rem,2.4vw,2.35rem)] font-extrabold leading-[1.08] tracking-[-0.05em] text-primary">
             AI 코딩의 시작:
             <br />
             Claude Code와 Vibe Coding
@@ -212,7 +212,7 @@ export function KnowledgeBasicsShowcase({
                   {item.step}
                 </span>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold tracking-[-0.03em] text-primary">{item.title}</h3>
+                  <h3 className="text-lg font-bold tracking-[-0.03em] text-primary">{item.title}</h3>
                   <p className="text-sm leading-7 text-muted-foreground">{item.body}</p>
                 </div>
               </div>
@@ -250,7 +250,7 @@ export function KnowledgeBasicsShowcase({
               <span className="text-sm font-bold tracking-[0.18em] text-secondary">
                 0{index + 1}
               </span>
-              <h3 className="mt-4 text-2xl font-bold tracking-[-0.04em] text-primary">{item.title}</h3>
+              <h3 className="mt-4 text-lg font-bold tracking-[-0.03em] text-primary">{item.title}</h3>
               <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.body}</p>
             </div>
           ))}
@@ -260,7 +260,7 @@ export function KnowledgeBasicsShowcase({
       <section className="panel-accent rounded-[2rem] px-6 py-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-2xl font-bold tracking-[-0.04em]">도움이 되었나요?</p>
+            <p className="text-lg font-bold tracking-[-0.03em]">도움이 되었나요?</p>
             <p className="mt-2 text-sm leading-7 text-white/72">
               기초를 익혔다면 이제 컨텍스트 관리와 보안 운영이 포함된 레벨업 가이드로 넘어가 보세요.
             </p>
@@ -305,7 +305,7 @@ export function KnowledgeLevelUpShowcase({
         <span className="inline-flex rounded-full bg-[rgba(255,107,108,0.08)] px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] text-secondary">
           Expert Path
         </span>
-        <h1 className="max-w-5xl text-[clamp(2.8rem,4.8vw,4.7rem)] font-extrabold leading-[1.02] tracking-[-0.07em] text-primary">
+        <h1 className="max-w-5xl text-[clamp(1.7rem,2.4vw,2.3rem)] font-extrabold leading-[1.08] tracking-[-0.05em] text-primary">
           레벨업: 전문가를 위한 가이드
         </h1>
         <p className="max-w-4xl text-base leading-8 text-muted-foreground">
@@ -319,7 +319,7 @@ export function KnowledgeLevelUpShowcase({
           <div className="flex size-14 items-center justify-center rounded-[1.4rem] bg-[rgba(59,53,97,0.08)] text-primary">
             <Sparkles className="size-7" />
           </div>
-          <h2 className="mt-8 text-[clamp(2rem,3vw,3rem)] font-extrabold tracking-[-0.05em] text-primary">
+          <h2 className="mt-8 text-[clamp(1.35rem,1.9vw,1.7rem)] font-extrabold tracking-[-0.04em] text-primary">
             {leadArticle?.title ?? "컨텍스트 관리 전략"}
           </h2>
           <p className="mt-5 max-w-3xl text-base leading-8 text-muted-foreground">
@@ -342,7 +342,7 @@ export function KnowledgeLevelUpShowcase({
           <div className="flex size-14 items-center justify-center rounded-[1.4rem] bg-white/12 text-white">
             <WandSparkles className="size-7" />
           </div>
-          <h2 className="mt-8 text-[clamp(1.8rem,3vw,2.7rem)] font-extrabold tracking-[-0.05em]">
+          <h2 className="mt-8 text-[clamp(1.4rem,2vw,1.85rem)] font-extrabold tracking-[-0.05em]">
             플랜 모드 마스터
           </h2>
           <p className="mt-4 text-base leading-8 text-white/84">
@@ -368,7 +368,7 @@ export function KnowledgeLevelUpShowcase({
           <div className="flex size-12 items-center justify-center rounded-2xl bg-[#ffc145] text-primary">
             <Shield className="size-6" />
           </div>
-          <h3 className="mt-5 text-2xl font-bold tracking-[-0.04em] text-primary">
+          <h3 className="mt-5 text-lg font-bold tracking-[-0.03em] text-primary">
             {securityArticle?.title ?? "보안 지침"}
           </h3>
           <ul className="mt-4 space-y-3 text-sm leading-7 text-muted-foreground">
@@ -381,7 +381,7 @@ export function KnowledgeLevelUpShowcase({
         <div className="surface-subtle rounded-[2rem] px-6 py-6">
           <div className="grid gap-5 md:grid-cols-[1.1fr_0.9fr] md:items-center">
             <div>
-              <h3 className="text-2xl font-bold tracking-[-0.04em] text-primary">
+              <h3 className="text-lg font-bold tracking-[-0.03em] text-primary">
                 {saasArticle?.title ?? "주요 SaaS 연동 가이드"}
               </h3>
               <p className="mt-3 text-sm leading-7 text-muted-foreground">
@@ -418,7 +418,7 @@ export function KnowledgeLevelUpShowcase({
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <h3 className="text-2xl font-bold tracking-[-0.04em] text-primary">{article.title}</h3>
+                  <h3 className="text-lg font-bold tracking-[-0.03em] text-primary">{article.title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{article.summary}</p>
                 </div>
               </div>
@@ -452,7 +452,7 @@ export function KnowledgeTipsShowcase({
         <span className="inline-flex rounded-full bg-[rgba(255,107,108,0.08)] px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] text-secondary">
           Pro Tip Collection
         </span>
-        <h1 className="max-w-5xl text-[clamp(2.8rem,5vw,4.9rem)] font-extrabold leading-[1.02] tracking-[-0.07em] text-primary">
+        <h1 className="max-w-5xl text-[clamp(1.7rem,2.4vw,2.35rem)] font-extrabold leading-[1.08] tracking-[-0.05em] text-primary">
           당신의 생산성을 깨우는
           <br />
           <span className="text-secondary">정교한 꿀팁 모음</span>
@@ -473,7 +473,7 @@ export function KnowledgeTipsShowcase({
               Top Pick
             </span>
           </div>
-          <h2 className="mt-6 max-w-3xl text-[clamp(2rem,3vw,3.1rem)] font-extrabold leading-[1.1] tracking-[-0.05em] text-primary">
+          <h2 className="mt-6 max-w-3xl text-[clamp(1.3rem,1.8vw,1.65rem)] font-extrabold leading-[1.14] tracking-[-0.04em] text-primary">
             {leadArticle?.title ?? "프롬프트 체이닝으로 복잡한 결과물 만들기"}
           </h2>
           <p className="mt-5 max-w-3xl text-base leading-8 text-muted-foreground">
@@ -502,7 +502,7 @@ export function KnowledgeTipsShowcase({
           <span className="mt-6 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/76">
             프롬프트
           </span>
-          <h2 className="mt-5 text-[clamp(1.9rem,3vw,2.8rem)] font-extrabold leading-[1.12] tracking-[-0.05em]">
+          <h2 className="mt-5 text-[clamp(1.4rem,2vw,1.9rem)] font-extrabold leading-[1.15] tracking-[-0.05em]">
             결과물이 달라지는
             <br />
             ‘역할 지정’의 기술
@@ -536,7 +536,7 @@ export function KnowledgeTipsShowcase({
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5">
                 <div className="min-w-0">
-                  <h3 className="text-xl font-bold tracking-[-0.04em] text-primary">{article.title}</h3>
+                  <h3 className="text-lg font-bold tracking-[-0.04em] text-primary">{article.title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{article.summary}</p>
                 </div>
                 <span className="shrink-0 text-sm font-bold text-secondary">
@@ -604,7 +604,7 @@ export function KnowledgeExternalShowcase({
         <span className="inline-flex rounded-full bg-[rgba(255,107,108,0.08)] px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] text-secondary">
           External Resources
         </span>
-        <h1 className="max-w-4xl text-[clamp(2.8rem,5vw,4.8rem)] font-extrabold leading-[1.02] tracking-[-0.07em] text-primary">
+        <h1 className="max-w-4xl text-[clamp(1.7rem,2.4vw,2.3rem)] font-extrabold leading-[1.08] tracking-[-0.05em] text-primary">
           외부 리소스 창고
         </h1>
         <p className="max-w-4xl text-base leading-8 text-muted-foreground">
@@ -621,7 +621,7 @@ export function KnowledgeExternalShowcase({
               FEATURED RESOURCE
             </span>
             <p className="text-sm text-white/68">{hostLabel(featuredArticle?.resourceUrl ?? null)}</p>
-            <h2 className="text-[clamp(2rem,3vw,3.3rem)] font-extrabold leading-[1.1] tracking-[-0.05em]">
+            <h2 className="text-[clamp(1.35rem,1.9vw,1.75rem)] font-extrabold leading-[1.14] tracking-[-0.04em]">
               {featuredArticle?.title ?? "대표 리소스"}
             </h2>
             <p className="max-w-2xl text-base leading-8 text-white/76">
@@ -647,7 +647,7 @@ export function KnowledgeExternalShowcase({
           <div className="flex size-12 items-center justify-center rounded-2xl bg-[#ffc145] text-primary">
             <Database className="size-6" />
           </div>
-          <h2 className="mt-6 text-[clamp(2rem,3vw,2.9rem)] font-extrabold tracking-[-0.05em]">
+          <h2 className="mt-6 text-[clamp(1.3rem,1.8vw,1.65rem)] font-extrabold tracking-[-0.04em]">
             리소스 통계
           </h2>
           <p className="mt-3 text-sm leading-7 text-white/72">
@@ -662,7 +662,7 @@ export function KnowledgeExternalShowcase({
               <div key={item.label} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-white/76">{item.label}</span>
-                  <span className="text-3xl font-extrabold tracking-[-0.05em]">{item.value}</span>
+                  <span className="text-2xl font-extrabold tracking-[-0.05em]">{item.value}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-white/14">
                   <div className={`h-full rounded-full ${item.tone}`} style={{ width: "72%" }} />
@@ -690,7 +690,7 @@ export function KnowledgeExternalShowcase({
                     <span>{hostLabel(article.resourceUrl)}</span>
                     <span className="text-muted-foreground">{estimateMinutes(article.contentMd)} min read</span>
                   </div>
-                  <h3 className="mt-3 text-[1.65rem] font-extrabold leading-[1.18] tracking-[-0.05em] text-primary">
+                  <h3 className="mt-3 text-[1.2rem] font-extrabold leading-[1.24] tracking-[-0.04em] text-primary">
                     {article.title}
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-muted-foreground">{article.summary}</p>

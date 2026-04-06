@@ -93,7 +93,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
               <p className="text-xs uppercase tracking-[0.24em] text-primary">
                 {project.serviceTypeLabel}
               </p>
-              <CardTitle className="text-3xl">{project.title}</CardTitle>
+              <CardTitle className="text-xl">{project.title}</CardTitle>
             </div>
             <span className="rounded-full border border-[#b8b8d1]/45 bg-[#fffffb]/72 px-3 py-1 text-xs text-muted-foreground">
               {statusLabelMap[project.status]}
@@ -157,7 +157,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
         <div className="space-y-6">
           <Card className="glass-panel rounded-[1.8rem] border-[#b8b8d1]/35">
             <CardHeader className="space-y-3">
-              <CardTitle className="text-xl">상태</CardTitle>
+              <CardTitle className="text-lg">상태</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {statusOptions.map((status) => (
@@ -186,7 +186,7 @@ export function ProjectDetail({ projectId }: ProjectDetailProps) {
             <CardHeader className="space-y-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="size-4 text-accent" />
-                <CardTitle className="text-xl">체크리스트</CardTitle>
+                <CardTitle className="text-lg">체크리스트</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">

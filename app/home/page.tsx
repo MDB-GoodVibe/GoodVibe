@@ -55,8 +55,8 @@ function CompactIntro({
       <h2
         className={
           accent
-            ? "text-[1.7rem] font-bold tracking-[-0.04em]"
-            : "text-[1.7rem] font-bold tracking-[-0.04em] text-primary"
+            ? "text-[1.3rem] font-bold tracking-[-0.03em]"
+            : "text-[1.3rem] font-bold tracking-[-0.03em] text-primary"
         }
       >
         {title}
@@ -146,7 +146,7 @@ export default async function HomeDashboardPage() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-xl font-bold tracking-[-0.03em] text-primary">
+                  <p className="text-lg font-bold tracking-[-0.03em] text-primary">
                     {menu.title}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -180,7 +180,7 @@ export default async function HomeDashboardPage() {
                     {idea.upvoteCount}
                   </span>
                 </div>
-                <h3 className="mt-4 text-xl font-bold tracking-[-0.03em] text-primary">
+                <h3 className="mt-4 text-lg font-bold tracking-[-0.03em] text-primary">
                   {idea.title}
                 </h3>
                 <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
@@ -224,7 +224,7 @@ export default async function HomeDashboardPage() {
                 </span>
                 <Sparkles className="size-4 text-primary" />
               </div>
-              <h3 className="mt-4 text-xl font-bold tracking-[-0.03em] text-primary">
+              <h3 className="mt-4 text-lg font-bold tracking-[-0.03em] text-primary">
                 {step.title}
               </h3>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">

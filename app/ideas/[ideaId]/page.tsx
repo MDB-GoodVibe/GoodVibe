@@ -50,7 +50,7 @@ export default async function IdeaDetailPage({
           </div>
 
           <div className="mt-5 space-y-4">
-            <h1 className="text-[clamp(2.3rem,4vw,4rem)] font-extrabold tracking-[-0.06em] text-primary">
+            <h1 className="text-[clamp(1.55rem,2.2vw,2.05rem)] font-extrabold tracking-[-0.04em] text-primary">
               {idea.title}
             </h1>
             <p className="max-w-4xl whitespace-pre-wrap text-[15px] leading-8 text-foreground/92">
@@ -66,7 +66,7 @@ export default async function IdeaDetailPage({
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-secondary">
                   References
                 </p>
-                <h2 className="mt-2 text-[1.35rem] font-bold tracking-[-0.04em] text-primary">
+                <h2 className="mt-2 text-[1.05rem] font-bold tracking-[-0.03em] text-primary">
                   참고 링크
                 </h2>
               </div>

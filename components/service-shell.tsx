@@ -389,7 +389,7 @@ export function ServiceShell({ children }: { children: ReactNode }) {
                     <SidebarIcon className="size-5" />
                   </div>
                   <div className="min-w-0">
-                    <h2 className="text-xl font-extrabold tracking-[-0.04em] text-primary">
+                    <h2 className="text-lg font-extrabold tracking-[-0.03em] text-primary">
                       {sidebarConfig.title}
                     </h2>
                     <p className="mt-1 text-[13px] text-muted-foreground">

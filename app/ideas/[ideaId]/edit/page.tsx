@@ -37,7 +37,7 @@ export default async function EditIdeaPage({
         <div className="mx-auto max-w-2xl">
           <Card className="glass-panel rounded-[2rem] border-[#b8b8d1]/35">
             <CardHeader className="space-y-3">
-              <CardTitle className="text-3xl">작성자만 수정할 수 있어요</CardTitle>
+              <CardTitle className="text-xl">작성자만 수정할 수 있어요</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm leading-7 text-muted-foreground">
@@ -58,7 +58,7 @@ export default async function EditIdeaPage({
       <div className="mx-auto max-w-3xl">
         <Card className="glass-panel rounded-[2rem] border-[#b8b8d1]/35">
           <CardHeader className="space-y-3">
-            <CardTitle className="text-3xl">아이디어 수정</CardTitle>
+            <CardTitle className="text-xl">아이디어 수정</CardTitle>
             <p className="text-sm leading-7 text-muted-foreground">
               등록한 회원 본인만 제목, 내용, 참고 링크를 수정할 수 있습니다.
             </p>

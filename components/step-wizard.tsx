@@ -227,7 +227,7 @@ export function StepWizard() {
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                 Step {currentStepMeta.id}
               </p>
-              <CardTitle className="text-3xl">{currentStepMeta.title}</CardTitle>
+              <CardTitle className="text-xl">{currentStepMeta.title}</CardTitle>
               <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
                 {currentStepMeta.description}
               </p>
@@ -400,7 +400,7 @@ export function StepWizard() {
                     <p className="text-sm font-semibold text-foreground">
                       선택된 시작 형태
                     </p>
-                    <p className="text-xl font-semibold text-foreground">
+                    <p className="text-lg font-semibold text-foreground">
                       {selectedServiceType?.name}
                     </p>
                     <p className="text-sm leading-6 text-muted-foreground">
@@ -577,7 +577,7 @@ export function StepWizard() {
                 <div className="space-y-4">
                   <Card className="glass-panel border-white/10 bg-white/5">
                     <CardHeader className="space-y-2">
-                      <CardTitle className="text-xl">목업 저장</CardTitle>
+                      <CardTitle className="text-lg">목업 저장</CardTitle>
                       <p className="text-sm leading-6 text-muted-foreground">
                         지금은 DB 없이 localStorage로 전체 플로우를 점검합니다.
                       </p>
@@ -604,7 +604,7 @@ export function StepWizard() {
 
                   <Card className="glass-panel border-white/10 bg-white/5">
                     <CardHeader className="space-y-2">
-                      <CardTitle className="text-xl">다음 연결 예정</CardTitle>
+                      <CardTitle className="text-lg">다음 연결 예정</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
                       <p>스킬 탐색 기능</p>

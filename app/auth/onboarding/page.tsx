@@ -55,7 +55,7 @@ export default async function OnboardingPage({
           <p className="text-[11px] font-extrabold uppercase tracking-[0.32em] text-primary/45">
             Google Login
           </p>
-          <h1 className="text-4xl font-extrabold tracking-[-0.08em] text-primary sm:text-5xl">
+          <h1 className="text-2xl font-extrabold tracking-[-0.06em] text-primary sm:text-3xl">
             닉네임을 정해 주세요
           </h1>
           <p className="text-sm leading-6 text-muted-foreground sm:text-base">
@@ -88,7 +88,7 @@ export default async function OnboardingPage({
 
           <PendingSubmitButton
             variant="secondary"
-            className="h-14 w-full rounded-[1.35rem] text-lg shadow-[0_18px_28px_rgba(176,72,72,0.18)]"
+            className="h-14 w-full rounded-[1.35rem] text-base shadow-[0_18px_28px_rgba(176,72,72,0.18)]"
             pendingLabel="저장 중..."
           >
             계속하기

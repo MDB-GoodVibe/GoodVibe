@@ -94,7 +94,7 @@ export default function SetupPage() {
                 Supabase 0단계 설정
               </div>
               <div className="space-y-3">
-                <h1 className="text-4xl font-semibold tracking-tight text-foreground">
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                   키를 넣기 전에
                   <br />
                   연결 구조부터 준비해 두었습니다.
@@ -144,7 +144,7 @@ export default function SetupPage() {
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <Card className="glass-panel rounded-[2rem] border-[#b8b8d1]/35">
             <CardHeader className="space-y-3">
-              <CardTitle className="text-2xl">1. .env.local 구조</CardTitle>
+              <CardTitle className="text-xl">1. .env.local 구조</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="rounded-[1.6rem] border border-[#b8b8d1]/35 bg-[#5b5f97] px-5 py-5 text-sm leading-7 whitespace-pre-wrap text-[#fffffb] shadow-soft">
@@ -200,7 +200,7 @@ SUPABASE_ACCESS_TOKEN=`}
           <div className="space-y-6">
             <Card className="glass-panel rounded-[2rem] border-[#b8b8d1]/35">
               <CardHeader className="space-y-3">
-                <CardTitle className="text-xl">2. 키 위치</CardTitle>
+                <CardTitle className="text-lg">2. 키 위치</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
                 <p>
@@ -244,7 +244,7 @@ SUPABASE_ACCESS_TOKEN=`}
               <CardHeader className="space-y-3">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="size-4 text-accent" />
-                  <CardTitle className="text-xl">3. 보안 규칙</CardTitle>
+                  <CardTitle className="text-lg">3. 보안 규칙</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">

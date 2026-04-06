@@ -85,7 +85,7 @@ export function KnowledgeTrackView({
             >
               {meta.kicker}
             </span>
-            <h1 className="text-[clamp(1.7rem,2.6vw,2.4rem)] font-extrabold tracking-[-0.05em] text-primary">
+            <h1 className="text-[clamp(1.35rem,1.9vw,1.75rem)] font-extrabold tracking-[-0.04em] text-primary">
               {title}
             </h1>
             <p className="max-w-3xl text-[13px] leading-6 text-muted-foreground sm:text-sm">
@@ -100,7 +100,7 @@ export function KnowledgeTrackView({
                   <p className="whitespace-nowrap text-[11px] font-semibold tracking-[0.18em] text-primary/55">
                     전체 문서
                   </p>
-                  <p className="mt-3 text-3xl font-extrabold tracking-[-0.05em] text-primary">
+                  <p className="mt-3 text-2xl font-extrabold tracking-[-0.05em] text-primary">
                     {articles.length}
                   </p>
                 </div>
@@ -115,7 +115,7 @@ export function KnowledgeTrackView({
                   <p className="whitespace-nowrap text-[11px] font-semibold tracking-[0.18em] text-primary/55">
                     추천 문서
                   </p>
-                  <p className="mt-3 text-3xl font-extrabold tracking-[-0.05em] text-primary">
+                  <p className="mt-3 text-2xl font-extrabold tracking-[-0.05em] text-primary">
                     {featuredCount}
                   </p>
                 </div>
@@ -154,7 +154,7 @@ export function KnowledgeTrackView({
               </div>
 
               <div className="mt-5 flex-1 space-y-3">
-                <h2 className="text-[1.25rem] font-extrabold leading-[1.22] tracking-[-0.04em] text-primary">
+                <h2 className="text-[1.05rem] font-extrabold leading-[1.28] tracking-[-0.03em] text-primary">
                   {article.title}
                 </h2>
                 <p className="line-clamp-4 text-[13px] leading-6 text-muted-foreground">

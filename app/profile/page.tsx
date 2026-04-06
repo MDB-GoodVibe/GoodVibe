@@ -58,7 +58,7 @@ export default async function ProfilePage() {
         <section className="w-full max-w-[430px] rounded-[2.2rem] border border-[rgba(121,118,127,0.08)] bg-white/96 px-7 py-8 shadow-[0_30px_80px_rgba(37,31,74,0.08)] backdrop-blur-xl sm:px-9 sm:py-10">
           <div className="space-y-6">
             <div className="space-y-4 text-center">
-              <h1 className="text-5xl font-extrabold tracking-[-0.08em] text-primary sm:text-6xl">
+              <h1 className="text-2xl font-extrabold tracking-[-0.05em] text-primary sm:text-3xl">
                 GoodVibe
               </h1>
               <p className="text-sm leading-7 text-muted-foreground">
@@ -77,7 +77,7 @@ export default async function ProfilePage() {
     <AuthCanvas>
       <section className="w-full max-w-[540px] rounded-[2rem] border border-[rgba(121,118,127,0.08)] bg-white/94 px-7 py-8 shadow-[0_26px_70px_rgba(37,31,74,0.08)] backdrop-blur-xl">
         <div className="space-y-2 text-center">
-          <h1 className="text-4xl font-extrabold tracking-[-0.08em] text-primary">
+          <h1 className="text-2xl font-extrabold tracking-[-0.05em] text-primary">
             {viewer.nickname ?? "GoodVibe 사용자"}
           </h1>
           <p className="text-base text-muted-foreground">
@@ -95,7 +95,7 @@ export default async function ProfilePage() {
             </p>
           </div>
 
-          <Button asChild variant="secondary" className="h-14 w-full rounded-2xl text-lg">
+          <Button asChild variant="secondary" className="h-14 w-full rounded-2xl text-base">
             <Link href="/home">
               홈으로 이동
               <ArrowRight className="size-4" />

@@ -38,7 +38,7 @@ export function PromptCard({
           <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary/70">
             Stage {stage.stage}
           </p>
-          <h3 className={compact ? "text-xl font-semibold text-primary" : "text-2xl font-semibold text-primary"}>
+          <h3 className={compact ? "text-lg font-semibold text-primary" : "text-xl font-semibold text-primary"}>
             {stage.title}
           </h3>
           {showObjective ? (

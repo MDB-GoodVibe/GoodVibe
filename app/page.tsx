@@ -17,7 +17,7 @@ export default function LandingPage() {
                 <p className="inline-flex rounded-full bg-white/12 px-4 py-1 text-[11px] font-extrabold uppercase tracking-[0.26em] text-white/82">
                   Good Vibe
                 </p>
-                <h1 className="max-w-4xl text-4xl font-extrabold leading-[1.02] tracking-[-0.08em] text-white sm:text-5xl lg:text-7xl">
+                <h1 className="max-w-4xl text-2xl font-extrabold leading-[1.08] tracking-[-0.06em] text-white sm:text-3xl lg:text-4xl">
                   아이디어에서
                   <br />
                   바이브 빌드까지.
@@ -41,7 +41,7 @@ export default function LandingPage() {
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-white/58">
                   Knowledge
                 </p>
-                <p className="mt-3 text-2xl font-bold tracking-[-0.04em] text-white">
+                <p className="mt-3 text-lg font-bold tracking-[-0.03em] text-white">
                   처음부터 실전까지
                 </p>
               </div>
@@ -50,7 +50,7 @@ export default function LandingPage() {
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-white/58">
                   Community
                 </p>
-                <p className="mt-3 text-2xl font-bold tracking-[-0.04em] text-white">
+                <p className="mt-3 text-lg font-bold tracking-[-0.03em] text-white">
                   좋은 아이디어를 고르고
                 </p>
               </div>
@@ -59,7 +59,7 @@ export default function LandingPage() {
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-white/58">
                   Helper
                 </p>
-                <p className="mt-3 text-2xl font-bold tracking-[-0.04em] text-white">
+                <p className="mt-3 text-lg font-bold tracking-[-0.03em] text-white">
                   구조와 프롬프트로 이어갑니다
                 </p>
               </div>

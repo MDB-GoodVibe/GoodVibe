@@ -57,7 +57,7 @@ export default async function KnowledgeContributePage({
         <span className="inline-flex rounded-full bg-[rgba(255,107,108,0.08)] px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.22em] text-secondary">
           Knowledge Contribution
         </span>
-        <h1 className="max-w-4xl text-[clamp(2.6rem,4.6vw,4.4rem)] font-extrabold leading-[1.04] tracking-[-0.07em] text-primary">
+        <h1 className="max-w-4xl text-[clamp(1.7rem,2.3vw,2.2rem)] font-extrabold leading-[1.1] tracking-[-0.04em] text-primary">
           좋은 지식을 제보해 주세요
         </h1>
         <p className="max-w-3xl text-base leading-8 text-muted-foreground">
@@ -163,7 +163,7 @@ export default async function KnowledgeContributePage({
 
         <div className="space-y-4">
           <div className="surface-subtle rounded-[2rem] px-6 py-6">
-            <p className="text-2xl font-bold tracking-[-0.04em] text-primary">
+            <p className="text-lg font-bold tracking-[-0.03em] text-primary">
               제보 전에 확인해 주세요
             </p>
             <ul className="mt-4 space-y-3 text-sm leading-7 text-muted-foreground">
@@ -175,7 +175,7 @@ export default async function KnowledgeContributePage({
 
           <div className="surface-subtle rounded-[2rem] px-6 py-6">
             <div className="flex items-center justify-between gap-4">
-              <p className="text-2xl font-bold tracking-[-0.04em] text-primary">내 제보 이력</p>
+              <p className="text-lg font-bold tracking-[-0.03em] text-primary">내 제보 이력</p>
               <span className="text-sm text-muted-foreground">{submissions.length}건</span>
             </div>
             <div className="mt-5 space-y-3">

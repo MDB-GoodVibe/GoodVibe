@@ -21,7 +21,7 @@ export function WorkspaceEmptyState({
   return (
     <section className="surface-subtle rounded-[2rem] px-6 py-10 sm:px-8">
       <p className="section-kicker">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-foreground">
+      <h2 className="mt-3 text-xl font-semibold tracking-[-0.03em] text-foreground sm:text-2xl">
         {title}
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">

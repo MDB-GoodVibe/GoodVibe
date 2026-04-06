@@ -14,7 +14,7 @@ export default async function SettingsPage() {
           <p className="inline-flex rounded-full bg-white/12 px-4 py-1 text-[11px] font-extrabold uppercase tracking-[0.24em] text-white/82">
             Settings
           </p>
-          <h1 className="text-4xl font-extrabold leading-[1.05] tracking-[-0.07em] text-white sm:text-5xl">
+          <h1 className="text-2xl font-extrabold leading-[1.08] tracking-[-0.05em] text-white sm:text-3xl">
             계정과 서비스 설정
           </h1>
           <p className="max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
@@ -29,7 +29,7 @@ export default async function SettingsPage() {
             <Wrench className="size-4 text-primary" />
             <p className="text-lg font-bold text-primary">계정</p>
           </div>
-          <p className="mt-4 text-2xl font-extrabold tracking-[-0.04em] text-primary">
+          <p className="mt-4 text-xl font-extrabold tracking-[-0.03em] text-primary">
             {viewer?.nickname ?? "로그인이 필요해요"}
           </p>
           <p className="mt-3 text-sm leading-7 text-muted-foreground">
@@ -45,7 +45,7 @@ export default async function SettingsPage() {
 
         <div className="surface-subtle rounded-[2rem] px-6 py-6">
           <p className="text-lg font-bold text-primary">서비스</p>
-          <p className="mt-4 text-2xl font-extrabold tracking-[-0.04em] text-primary">
+          <p className="mt-4 text-xl font-extrabold tracking-[-0.03em] text-primary">
             Good Vibe 기본 설정
           </p>
           <p className="mt-3 text-sm leading-7 text-muted-foreground">
