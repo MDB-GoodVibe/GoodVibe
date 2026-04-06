@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { FileText, Plus, Search, Sparkles } from "lucide-react";
+import { FileText, Plus, Sparkles } from "lucide-react";
 
+import { IdeaBoardFilters } from "@/components/ideas/idea-board-filters";
 import { IdeaVoteButton } from "@/components/ideas/idea-vote-button";
 import { Button } from "@/components/ui/button";
-import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { getCurrentViewer } from "@/lib/auth/viewer";
 import { listIdeaPosts } from "@/lib/repositories/ideas";
 import type { IdeaSort } from "@/types/good-vibe";
@@ -49,7 +49,7 @@ export default async function IdeasPage({
               아이디어 보드
             </h1>
             <p className="text-[13px] leading-6 text-muted-foreground">
-              등록된 아이디어를 보고, 추천하고, 바로 헬퍼로 이어갈 수 있습니다.
+              등록된 아이디어를 보고, 추천하고, 바로 헬퍼 흐름으로 이어갈 수 있습니다.
             </p>
           </div>
 
@@ -69,14 +69,17 @@ export default async function IdeasPage({
 
       <section className="grid gap-3 sm:gap-4 xl:grid-cols-[1.4fr_0.7fr_0.9fr]">
         <div className="rounded-[1.5rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_12px_24px_rgba(37,31,74,0.05)] sm:rounded-[1.7rem] sm:px-5 sm:py-5">
-          <p className="text-[12px] font-semibold text-muted-foreground">아이디어 플로우</p>
+          <p className="text-[12px] font-semibold text-muted-foreground">아이디어 흐름</p>
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {[
-              ["01", "등록", "생각한 문제나 서비스 아이디어를 올립니다."],
-              ["02", "추천", "좋은 아이디어를 먼저 골라냅니다."],
-              ["03", "연결", "선택한 아이디어를 헬퍼로 이어갑니다."],
+              ["01", "등록", "생각나는 문제나 서비스 아이디어를 먼저 남깁니다."],
+              ["02", "추천", "좋은 아이디어를 빠르게 고르고 반응을 모읍니다."],
+              ["03", "연결", "선택한 아이디어를 헬퍼로 가져가 바로 실행 흐름으로 이어갑니다."],
             ].map(([step, title, body]) => (
-              <div key={step} className="rounded-[1.1rem] bg-[rgba(244,243,243,0.9)] px-3.5 py-3.5 sm:rounded-[1.2rem] sm:px-4 sm:py-4">
+              <div
+                key={step}
+                className="rounded-[1.1rem] bg-[rgba(244,243,243,0.9)] px-3.5 py-3.5 sm:rounded-[1.2rem] sm:px-4 sm:py-4"
+              >
                 <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-secondary">
                   {step}
                 </p>
@@ -89,54 +92,24 @@ export default async function IdeasPage({
 
         <div className="rounded-[1.5rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_12px_24px_rgba(37,31,74,0.05)] sm:rounded-[1.7rem] sm:px-5 sm:py-5">
           <p className="text-[12px] font-semibold text-muted-foreground">등록 수</p>
-          <p className="mt-3 text-[1.75rem] font-bold tracking-[-0.05em] text-primary sm:text-[2rem]">{ideas.length}</p>
+          <p className="mt-3 text-[1.75rem] font-bold tracking-[-0.05em] text-primary sm:text-[2rem]">
+            {ideas.length}
+          </p>
           <p className="mt-1 text-[13px] text-muted-foreground">
             {query ? "검색 결과 기준" : "전체 공개 아이디어"}
           </p>
         </div>
 
         <div className="rounded-[1.5rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_12px_24px_rgba(37,31,74,0.05)] sm:rounded-[1.7rem] sm:px-5 sm:py-5">
-          <p className="text-[12px] font-semibold text-muted-foreground">상위 추천 수</p>
-          <p className="mt-3 text-[1.75rem] font-bold tracking-[-0.05em] text-primary sm:text-[2rem]">{topVoted}</p>
-          <p className="mt-1 text-[13px] text-muted-foreground">상위 3개 아이디어 합계</p>
+          <p className="text-[12px] font-semibold text-muted-foreground">상위 추천 합계</p>
+          <p className="mt-3 text-[1.75rem] font-bold tracking-[-0.05em] text-primary sm:text-[2rem]">
+            {topVoted}
+          </p>
+          <p className="mt-1 text-[13px] text-muted-foreground">상위 3개 아이디어 기준</p>
         </div>
       </section>
 
-      <section className="rounded-[1.6rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4 shadow-[0_12px_24px_rgba(37,31,74,0.05)] sm:rounded-[1.8rem] sm:px-5 sm:py-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <form action="/ideas" className="flex w-full flex-col gap-2 sm:flex-row lg:max-w-[520px]">
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                name="q"
-                defaultValue={query}
-                placeholder="아이디어 검색"
-                className="h-11 w-full rounded-xl border border-[rgba(121,118,127,0.12)] bg-[rgba(244,243,243,0.92)] pl-10 pr-4 text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
-              />
-              <input type="hidden" name="sort" value={sort} />
-            </div>
-            <PendingSubmitButton size="sm" pendingLabel="검색 중...">
-              검색
-            </PendingSubmitButton>
-          </form>
-
-          <div className="flex w-full lg:w-auto lg:justify-end">
-            <div className="inline-flex w-full justify-between rounded-full border border-[rgba(121,118,127,0.12)] bg-[rgba(244,243,243,0.92)] p-1 sm:w-auto sm:justify-start">
-            <Button asChild size="sm" variant={sort === "latest" ? "secondary" : "ghost"}>
-              <Link href={query ? `/ideas?sort=latest&q=${encodeURIComponent(query)}` : "/ideas?sort=latest"}>
-                최신순
-              </Link>
-            </Button>
-            <Button asChild size="sm" variant={sort === "popular" ? "secondary" : "ghost"}>
-              <Link href={query ? `/ideas?sort=popular&q=${encodeURIComponent(query)}` : "/ideas?sort=popular"}>
-                추천순
-              </Link>
-            </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <IdeaBoardFilters initialQuery={query} sort={sort} />
 
       {ideas.length > 0 ? (
         <section className="grid gap-3 sm:gap-4 md:grid-cols-2 2xl:grid-cols-3">
@@ -193,9 +166,11 @@ export default async function IdeasPage({
         </section>
       ) : (
         <section className="rounded-[1.6rem] border border-dashed border-[rgba(121,118,127,0.18)] bg-white px-5 py-8 text-center shadow-[0_12px_24px_rgba(37,31,74,0.04)] sm:rounded-[1.8rem] sm:px-6 sm:py-10">
-          <p className="text-[15px] font-semibold text-primary">조건에 맞는 아이디어가 없습니다.</p>
+          <p className="text-[15px] font-semibold text-primary">
+            조건에 맞는 아이디어가 없습니다.
+          </p>
           <p className="mt-2 text-[13px] text-muted-foreground">
-            검색어를 바꾸거나 새 아이디어를 등록해 보세요.
+            검색어를 바꾸거나 새 아이디어를 등록해보세요.
           </p>
         </section>
       )}
