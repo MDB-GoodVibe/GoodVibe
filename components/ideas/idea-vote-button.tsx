@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useActionState, useEffect, useOptimistic } from "react";
+import { useRouter } from "next/navigation";
 import { LoaderCircle, ThumbsUp } from "lucide-react";
-import { useFormStatus } from "react-dom";
 
 import { toggleIdeaVoteAction } from "@/app/ideas/actions";
 import { cn } from "@/lib/utils";
+
+type ToggleIdeaVoteState = {
+  count: number;
+  voted: boolean;
+  status: "idle" | "success" | "error";
+  redirectTo: string | null;
+};
 
 type IdeaVoteButtonProps = {
   ideaId: string;
@@ -20,15 +27,15 @@ function IdeaVoteSubmit({
   count,
   voted,
   mode,
+  pending,
   className,
 }: {
   count: number;
   voted: boolean;
   mode: "chip" | "panel";
+  pending: boolean;
   className?: string;
 }) {
-  const { pending } = useFormStatus();
-
   if (mode === "panel") {
     return (
       <button
@@ -83,24 +90,55 @@ export function IdeaVoteButton({
   mode = "chip",
   className,
 }: IdeaVoteButtonProps) {
-  const [optimisticCount, setOptimisticCount] = useState(upvoteCount);
-  const [optimisticVoted, setOptimisticVoted] = useState(viewerHasVoted);
+  const router = useRouter();
+  const [state, formAction, pending] = useActionState<ToggleIdeaVoteState, FormData>(
+    toggleIdeaVoteAction,
+    {
+      count: upvoteCount,
+      voted: viewerHasVoted,
+      status: "idle",
+      redirectTo: null,
+    },
+  );
+  const [optimisticState, addOptimisticVote] = useOptimistic(
+    {
+      count: state.count,
+      voted: state.voted,
+    },
+    (currentState) => ({
+      count: currentState.voted
+        ? Math.max(0, currentState.count - 1)
+        : currentState.count + 1,
+      voted: !currentState.voted,
+    }),
+  );
+
+  useEffect(() => {
+    if (state.redirectTo) {
+      router.push(state.redirectTo);
+      return;
+    }
+
+    if (state.status === "success") {
+      startTransition(() => {
+        router.refresh();
+      });
+    }
+  }, [router, state]);
 
   function handleSubmit() {
-    setOptimisticCount((current) =>
-      optimisticVoted ? Math.max(0, current - 1) : current + 1,
-    );
-    setOptimisticVoted((current) => !current);
+    addOptimisticVote(null);
   }
 
   return (
-    <form action={toggleIdeaVoteAction} onSubmit={handleSubmit}>
+    <form action={formAction} onSubmit={handleSubmit}>
       <input type="hidden" name="ideaId" value={ideaId} />
       <input type="hidden" name="nextPath" value={nextPath} />
       <IdeaVoteSubmit
-        count={optimisticCount}
-        voted={optimisticVoted}
+        count={optimisticState.count}
+        voted={optimisticState.voted}
         mode={mode}
+        pending={pending}
         className={className}
       />
     </form>

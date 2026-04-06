@@ -7,7 +7,6 @@ import {
   collectIdeaReferenceLinks,
   serializeIdeaReferenceLinks,
 } from "@/lib/ideas/reference-links";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function requireIdeaAuthor(
@@ -33,27 +32,12 @@ async function requireIdeaAuthor(
   return supabase;
 }
 
-async function syncIdeaUpvoteCount(ideaId: string) {
-  const admin = createSupabaseAdminClient();
-
-  if (!admin) {
-    return;
-  }
-
-  const { count, error: countError } = await admin
-    .from("idea_votes")
-    .select("idea_id", { count: "exact", head: true })
-    .eq("idea_id", ideaId);
-
-  if (countError) {
-    return;
-  }
-
-  await admin
-    .from("ideas")
-    .update({ upvote_count: count ?? 0 })
-    .eq("id", ideaId);
-}
+export type ToggleIdeaVoteState = {
+  count: number;
+  voted: boolean;
+  status: "idle" | "success" | "error";
+  redirectTo: string | null;
+};
 
 export async function createIdeaPostAction(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -156,19 +140,29 @@ export async function updateIdeaPostAction(formData: FormData) {
   redirect(`/ideas/${ideaId}`);
 }
 
-export async function toggleIdeaVoteAction(formData: FormData) {
+export async function toggleIdeaVoteAction(
+  previousState: ToggleIdeaVoteState,
+  formData: FormData,
+) {
   const ideaId = String(formData.get("ideaId") ?? "").trim();
   const nextPath = String(formData.get("nextPath") ?? "").trim();
   const fallbackPath = nextPath || `/ideas/${ideaId}`;
 
   if (!ideaId) {
-    return;
+    return {
+      ...previousState,
+      status: "error" as const,
+    };
   }
 
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    redirect("/setup");
+    return {
+      ...previousState,
+      status: "error" as const,
+      redirectTo: "/setup",
+    };
   }
 
   const {
@@ -176,34 +170,51 @@ export async function toggleIdeaVoteAction(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/profile?next=${encodeURIComponent(fallbackPath)}`);
+    return {
+      ...previousState,
+      status: "error" as const,
+      redirectTo: `/profile?next=${encodeURIComponent(fallbackPath)}`,
+    };
   }
 
-  const { data: existingVote } = await supabase
-    .from("idea_votes")
-    .select("idea_id")
-    .eq("idea_id", ideaId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (existingVote) {
-    await supabase
+  if (previousState.voted) {
+    const { error } = await supabase
       .from("idea_votes")
       .delete()
       .eq("idea_id", ideaId)
       .eq("user_id", user.id);
-  } else {
-    await supabase.from("idea_votes").insert({
-      idea_id: ideaId,
-      user_id: user.id,
-    });
+
+    if (error) {
+      return {
+        ...previousState,
+        status: "error" as const,
+      };
+    }
+
+    return {
+      count: Math.max(0, previousState.count - 1),
+      voted: false,
+      status: "success" as const,
+      redirectTo: null,
+    };
   }
 
-  await syncIdeaUpvoteCount(ideaId);
+  const { error } = await supabase.from("idea_votes").insert({
+    idea_id: ideaId,
+    user_id: user.id,
+  });
 
-  revalidatePath("/home");
-  revalidatePath("/ideas");
-  revalidatePath("/ideas/mine");
-  revalidatePath(`/ideas/${ideaId}`);
-  redirect(fallbackPath);
+  if (error) {
+    return {
+      ...previousState,
+      status: "error" as const,
+    };
+  }
+
+  return {
+    count: previousState.count + 1,
+    voted: true,
+    status: "success" as const,
+    redirectTo: null,
+  };
 }
