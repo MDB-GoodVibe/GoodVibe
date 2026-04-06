@@ -135,6 +135,8 @@ export async function updateIdeaPostAction(formData: FormData) {
 
 export async function toggleIdeaVoteAction(formData: FormData) {
   const ideaId = String(formData.get("ideaId") ?? "").trim();
+  const nextPath = String(formData.get("nextPath") ?? "").trim();
+  const fallbackPath = nextPath || `/ideas/${ideaId}`;
 
   if (!ideaId) {
     return;
@@ -151,7 +153,7 @@ export async function toggleIdeaVoteAction(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/profile?next=/ideas/${ideaId}`);
+    redirect(`/profile?next=${encodeURIComponent(fallbackPath)}`);
   }
 
   const { data: existingVote } = await supabase
@@ -161,14 +163,22 @@ export async function toggleIdeaVoteAction(formData: FormData) {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!existingVote) {
+  if (existingVote) {
+    await supabase
+      .from("idea_votes")
+      .delete()
+      .eq("idea_id", ideaId)
+      .eq("user_id", user.id);
+  } else {
     await supabase.from("idea_votes").insert({
       idea_id: ideaId,
       user_id: user.id,
     });
   }
 
+  revalidatePath("/home");
   revalidatePath("/ideas");
   revalidatePath("/ideas/mine");
   revalidatePath(`/ideas/${ideaId}`);
+  redirect(fallbackPath);
 }

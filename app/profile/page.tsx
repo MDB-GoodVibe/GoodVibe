@@ -45,11 +45,17 @@ function AuthCanvas({
   );
 }
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const params = await searchParams;
   const viewer = await getCurrentViewer();
+  const nextPath = params.next?.trim() || "/home";
 
   if (viewer && !viewer.nickname) {
-    redirect("/auth/onboarding?next=/home");
+    redirect(`/auth/onboarding?next=${encodeURIComponent(nextPath)}`);
   }
 
   if (!viewer) {
@@ -66,7 +72,7 @@ export default async function ProfilePage() {
               </p>
             </div>
 
-            <GoogleSignInButton next="/home" />
+            <GoogleSignInButton next={nextPath} />
           </div>
         </section>
       </AuthCanvas>

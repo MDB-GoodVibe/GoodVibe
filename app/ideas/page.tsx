@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { FileText, Plus, Search, Sparkles, ThumbsUp } from "lucide-react";
+import { FileText, Plus, Search, Sparkles } from "lucide-react";
 
+import { IdeaVoteButton } from "@/components/ideas/idea-vote-button";
 import { Button } from "@/components/ui/button";
 import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { getCurrentViewer } from "@/lib/auth/viewer";
@@ -25,6 +26,11 @@ export default async function IdeasPage({
   const query = params.q?.trim() ?? "";
   const viewer = await getCurrentViewer();
   const ideas = await listIdeaPosts(sort, viewer?.id, query);
+  const currentIdeasPath = query
+    ? `/ideas?sort=${sort}&q=${encodeURIComponent(query)}`
+    : sort === "popular"
+      ? "/ideas?sort=popular"
+      : "/ideas";
 
   const topVoted = [...ideas]
     .sort((a, b) => b.upvoteCount - a.upvoteCount)
@@ -142,10 +148,13 @@ export default async function IdeasPage({
                   <span>{formatIdeaDate(idea.createdAt)}</span>
                   <span>{idea.authorName}</span>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[rgba(244,243,243,0.92)] px-3 py-1 text-[12px] font-semibold text-primary">
-                  <ThumbsUp className="size-3.5" />
-                  {idea.upvoteCount}
-                </span>
+                <IdeaVoteButton
+                  key={`${idea.id}:${idea.upvoteCount}:${idea.viewerHasVoted}`}
+                  ideaId={idea.id}
+                  nextPath={currentIdeasPath}
+                  upvoteCount={idea.upvoteCount}
+                  viewerHasVoted={idea.viewerHasVoted}
+                />
               </div>
 
               <div className="mt-4 flex-1 space-y-3">
