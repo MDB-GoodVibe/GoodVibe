@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 function isNavigableAnchor(target: EventTarget | null) {
@@ -44,7 +44,6 @@ function isNavigableAnchor(target: EventTarget | null) {
 
 export function GlobalInteractionLoader() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const timeoutRef = useRef<number | null>(null);
 
@@ -73,7 +72,7 @@ export function GlobalInteractionLoader() {
     return () => {
       window.clearTimeout(settleTimer);
     };
-  }, [pathname, searchParams, isLoading]);
+  }, [pathname, isLoading]);
 
   useEffect(() => {
     function startLoading() {
