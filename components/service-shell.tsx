@@ -176,6 +176,13 @@ function getSidebarConfig(
                       exact: true,
                     },
                     {
+                      href: "/admin/knowledge/youtube",
+                      label: "유튜브 동기화",
+                      icon: ExternalLink,
+                      match: ["/admin/knowledge/youtube"],
+                      exact: true,
+                    },
+                    {
                       href: "/admin/knowledge/submissions",
                       label: "지식 제보함",
                       icon: WandSparkles,
@@ -209,6 +216,13 @@ function getSidebarConfig(
                 label: "지식 문서 관리",
                 icon: FileText,
                 match: ["/admin/knowledge", "/admin/knowledge/new"],
+                exact: true,
+              },
+              {
+                href: "/admin/knowledge/youtube",
+                label: "유튜브 동기화",
+                icon: ExternalLink,
+                match: ["/admin/knowledge/youtube"],
                 exact: true,
               },
               {

@@ -9,7 +9,10 @@ import {
   formatExternalTaxonomyPath,
   getExternalTaxonomy,
 } from "@/lib/knowledge/external-resource";
-import { getKnowledgeArticleBySlug } from "@/lib/repositories/knowledge";
+import {
+  getKnowledgeArticleById,
+  getKnowledgeArticleBySlug,
+} from "@/lib/repositories/knowledge";
 import type { KnowledgeTrack } from "@/types/good-vibe";
 
 const topicLabelMap: Record<string, string> = {
@@ -51,11 +54,20 @@ function formatPublishedDate(value: string | null) {
 
 export default async function KnowledgeArticlePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ id?: string }>;
 }) {
   const { slug } = await params;
-  const article = await getKnowledgeArticleBySlug(slug);
+  const query = await searchParams;
+  const fallbackId = typeof query.id === "string" ? query.id.trim() : "";
+
+  let article = await getKnowledgeArticleBySlug(slug);
+
+  if (!article && fallbackId) {
+    article = await getKnowledgeArticleById(fallbackId);
+  }
 
   if (!article) {
     redirect("/knowledge/basics");

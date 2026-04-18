@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 
 import { AppFrame } from "@/components/app-frame";
+import { GlobalInteractionLoader } from "@/components/global-interaction-loader";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="h-full antialiased">
       <body className={`${manrope.variable} min-h-full flex flex-col overflow-x-hidden`}>
+        <GlobalInteractionLoader />
         <AppFrame>{children}</AppFrame>
       </body>
     </html>

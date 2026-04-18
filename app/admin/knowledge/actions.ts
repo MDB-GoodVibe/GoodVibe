@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import {
   getDefaultKnowledgeTopic,
@@ -283,4 +284,54 @@ export async function createKnowledgeArticleAction(
     redirectTo: "/admin/knowledge",
     slug,
   };
+}
+
+export async function deleteKnowledgeArticleAction(formData: FormData) {
+  const viewer = await requireAdminViewer();
+
+  if (!viewer) {
+    redirect("/admin/knowledge?error=forbidden");
+  }
+
+  const articleId = cleanText(formData.get("articleId")?.toString());
+
+  if (!articleId) {
+    redirect("/admin/knowledge?error=invalid_article_id");
+  }
+
+  const supabase = await getWritableSupabaseClient();
+
+  if (!supabase) {
+    redirect("/admin/knowledge?error=supabase_not_configured");
+  }
+
+  const { error: unlinkYoutubeVideoError } = await supabase
+    .from("youtube_videos")
+    .update({
+      knowledge_article_id: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("knowledge_article_id", articleId);
+
+  if (unlinkYoutubeVideoError) {
+    redirect("/admin/knowledge?error=failed_to_unlink_youtube_video");
+  }
+
+  const { error: deleteError } = await supabase
+    .from("knowledge_articles")
+    .delete()
+    .eq("id", articleId);
+
+  if (deleteError) {
+    redirect("/admin/knowledge?error=failed_to_delete_article");
+  }
+
+  revalidatePath("/admin/knowledge");
+  revalidatePath("/admin/knowledge/new");
+  revalidatePath("/admin/knowledge/submissions");
+  revalidatePath("/admin/knowledge/youtube");
+  revalidatePath("/knowledge/basics");
+  revalidatePath("/knowledge/level-up");
+  revalidatePath("/knowledge/tips");
+  revalidatePath("/knowledge/external");
 }

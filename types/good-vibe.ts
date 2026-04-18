@@ -29,6 +29,14 @@ export type KnowledgeSubmissionStatus =
   | "reviewing"
   | "accepted"
   | "rejected";
+export type YouTubeTranscriptMode = "captions" | "metadata";
+export type YouTubeSyncJobType = "backfill" | "daily";
+export type YouTubeSyncJobStatus =
+  | "pending"
+  | "running"
+  | "retrying"
+  | "completed"
+  | "failed";
 
 export interface ViewerProfile {
   id: string;
@@ -85,6 +93,10 @@ export interface KnowledgeArticle {
   createdAt: string;
   updatedAt: string;
   externalTaxonomy: ExternalResourceTaxonomy | null;
+  externalProvider?: string | null;
+  externalSourceId?: string | null;
+  externalSourceLabel?: string | null;
+  externalItemId?: string | null;
   source: "seed" | "supabase";
 }
 
@@ -102,4 +114,47 @@ export interface KnowledgeSubmission {
   updatedAt: string;
   externalTaxonomy: ExternalResourceTaxonomy | null;
   source: "supabase";
+}
+
+export interface YouTubeChannel {
+  id: string;
+  youtubeChannelId: string;
+  title: string;
+  handle: string | null;
+  channelUrl: string;
+  thumbnailUrl: string | null;
+  isActive: boolean;
+  lastSyncedAt: string | null;
+  lastVideoPublishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface YouTubeVideo {
+  id: string;
+  channelId: string;
+  youtubeVideoId: string;
+  title: string;
+  description: string;
+  publishedAt: string;
+  watchUrl: string;
+  thumbnailUrl: string | null;
+  transcriptMode: YouTubeTranscriptMode;
+  knowledgeArticleId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface YouTubeSyncJob {
+  id: string;
+  jobType: YouTubeSyncJobType;
+  status: YouTubeSyncJobStatus;
+  payload: Record<string, unknown>;
+  attempts: number;
+  error: string | null;
+  scheduledAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }

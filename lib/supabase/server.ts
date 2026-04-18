@@ -1,7 +1,6 @@
-import "server-only";
 
 import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies } from "next/headers.js";
 
 import { getSupabasePublicRuntime } from "@/lib/env";
 
@@ -25,7 +24,7 @@ export async function createSupabaseServerClient() {
             cookieStore.set(name, value, options);
           });
         } catch {
-          // 서버 컴포넌트에서 읽기 전용으로 호출되는 경우가 있어 조용히 무시합니다.
+          // ?쒕쾭 而댄룷?뚰듃?먯꽌 ?쎄린 ?꾩슜?쇰줈 ?몄텧?섎뒗 寃쎌슦媛 ?덉뼱 議곗슜??臾댁떆?⑸땲??
         }
       },
     },

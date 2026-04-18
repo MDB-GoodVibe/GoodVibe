@@ -1,4 +1,4 @@
-import { KnowledgeExternalTrackView } from "@/components/knowledge-external-track-view";
+﻿import { KnowledgeExternalTrackView } from "@/components/knowledge-external-track-view";
 import { listKnowledgeArticles } from "@/lib/repositories/knowledge";
 
 export default async function KnowledgeExternalPage() {

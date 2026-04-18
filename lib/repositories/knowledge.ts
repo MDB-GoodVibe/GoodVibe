@@ -19,6 +19,10 @@ function normalizeKnowledgeRow(
     platform_tags: string[] | null;
     tool_tags: string[] | null;
     resource_url: string | null;
+    external_provider: string | null;
+    external_source_id: string | null;
+    external_source_label: string | null;
+    external_item_id: string | null;
     published_at: string | null;
     created_at: string;
     updated_at: string;
@@ -46,6 +50,10 @@ function normalizeKnowledgeRow(
     publishedAt: row.published_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    externalProvider: row.external_provider ?? null,
+    externalSourceId: row.external_source_id ?? null,
+    externalSourceLabel: row.external_source_label ?? null,
+    externalItemId: row.external_item_id ?? null,
     externalTaxonomy:
       row.track === "external" || row.resource_url
         ? classifyExternalResource({
@@ -84,7 +92,7 @@ export async function listKnowledgeArticles(track: KnowledgeTrack) {
   const { data, error } = await supabase
     .from("knowledge_articles")
     .select(
-      "id,slug,title,summary,content_md,track,topic,status,featured,platform_tags,tool_tags,resource_url,published_at,created_at,updated_at",
+      "id,slug,title,summary,content_md,track,topic,status,featured,platform_tags,tool_tags,resource_url,external_provider,external_source_id,external_source_label,external_item_id,published_at,created_at,updated_at",
     )
     .eq("track", track)
     .eq("status", "published")
@@ -112,7 +120,7 @@ export async function getKnowledgeArticleBySlug(slug: string) {
   const { data, error } = await supabase
     .from("knowledge_articles")
     .select(
-      "id,slug,title,summary,content_md,track,topic,status,featured,platform_tags,tool_tags,resource_url,published_at,created_at,updated_at",
+      "id,slug,title,summary,content_md,track,topic,status,featured,platform_tags,tool_tags,resource_url,external_provider,external_source_id,external_source_label,external_item_id,published_at,created_at,updated_at",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -122,6 +130,37 @@ export async function getKnowledgeArticleBySlug(slug: string) {
     return (
       seedKnowledgeArticles.find(
         (article) => article.slug === slug && article.status === "published",
+      ) ?? null
+    );
+  }
+
+  return normalizeKnowledgeRow(data);
+}
+
+export async function getKnowledgeArticleById(id: string) {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return (
+      seedKnowledgeArticles.find(
+        (article) => article.id === id && article.status === "published",
+      ) ?? null
+    );
+  }
+
+  const { data, error } = await supabase
+    .from("knowledge_articles")
+    .select(
+      "id,slug,title,summary,content_md,track,topic,status,featured,platform_tags,tool_tags,resource_url,external_provider,external_source_id,external_source_label,external_item_id,published_at,created_at,updated_at",
+    )
+    .eq("id", id)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (error || !data) {
+    return (
+      seedKnowledgeArticles.find(
+        (article) => article.id === id && article.status === "published",
       ) ?? null
     );
   }
@@ -139,7 +178,7 @@ export async function listKnowledgeArticlesForAdmin() {
   const { data, error } = await supabase
     .from("knowledge_articles")
     .select(
-      "id,slug,title,summary,content_md,track,topic,status,featured,platform_tags,tool_tags,resource_url,published_at,created_at,updated_at",
+      "id,slug,title,summary,content_md,track,topic,status,featured,platform_tags,tool_tags,resource_url,external_provider,external_source_id,external_source_label,external_item_id,published_at,created_at,updated_at",
     )
     .order("updated_at", { ascending: false });
 

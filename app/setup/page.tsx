@@ -48,6 +48,18 @@ const optionalEnvRows = [
     key: "SUPABASE_ACCESS_TOKEN",
     description: "Supabase 계정 토큰",
   },
+  {
+    key: "YOUTUBE_API_KEY",
+    description: "YouTube Data API v3 키",
+  },
+  {
+    key: "YOUTUBE_SYNC_SECRET",
+    description: "유튜브 일일 동기화 내부 API 호출 시크릿",
+  },
+  {
+    key: "YOUTUBE_DEFAULT_LANGS",
+    description: "자막 우선 언어 순서 (예: ko,en)",
+  },
 ] as const;
 
 function StatusRow({
@@ -162,7 +174,12 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 # 선택: 향후 CLI/운영 자동화용
 SUPABASE_PROJECT_REF=
-SUPABASE_ACCESS_TOKEN=`}
+SUPABASE_ACCESS_TOKEN=
+
+# 선택: YouTube 외부 리소스 동기화용
+YOUTUBE_API_KEY=
+YOUTUBE_SYNC_SECRET=
+YOUTUBE_DEFAULT_LANGS=ko,en`}
               </div>
 
               <div className="grid gap-3">
@@ -237,6 +254,14 @@ SUPABASE_ACCESS_TOKEN=`}
                   </strong>
                   에서 관리합니다.
                 </p>
+                <p>
+                  YouTube Data API:
+                  <br />
+                  <strong className="text-foreground">
+                    Google Cloud Console → APIs & Services
+                  </strong>
+                  에서 API 키를 발급해 <code className="mx-1 rounded bg-[#fffffb] px-1.5 py-0.5 text-foreground">YOUTUBE_API_KEY</code>에 등록합니다.
+                </p>
               </CardContent>
             </Card>
 
@@ -255,6 +280,10 @@ SUPABASE_ACCESS_TOKEN=`}
                 <p>
                   Secret / service_role 계열 키는 절대 Git에 올리지 말고,
                   대화창이나 문서에도 그대로 붙이지 않습니다.
+                </p>
+                <p>
+                  <code className="mx-1 rounded bg-[#fffffb] px-1.5 py-0.5 text-foreground">YOUTUBE_SYNC_SECRET</code>도
+                  서버에서만 사용하고 클라이언트 번들로 노출하지 않습니다.
                 </p>
                 <p>
                   Google Client ID / Secret은 Next.js env보다 Supabase Google Provider 설정에
@@ -286,6 +315,16 @@ SUPABASE_ACCESS_TOKEN=`}
               rel="noreferrer"
             >
               Google 로그인 문서
+              <ExternalLink className="size-4" />
+            </a>
+          </Button>
+          <Button asChild variant="outline" size="lg">
+            <a
+              href="https://developers.google.com/youtube/v3/getting-started"
+              target="_blank"
+              rel="noreferrer"
+            >
+              YouTube Data API 문서
               <ExternalLink className="size-4" />
             </a>
           </Button>

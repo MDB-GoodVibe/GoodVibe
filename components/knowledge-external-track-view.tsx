@@ -33,11 +33,11 @@ type FilterOption = {
   count: number;
 };
 
-type FilterKind = "channel" | "category" | "subcategory";
+type FilterKind = "channel" | "category" | "subcategory" | "source";
 
 function formatDate(value: string | null) {
   if (!value) {
-    return "최신 업데이트";
+    return "Latest update";
   }
 
   return new Intl.DateTimeFormat("ko-KR", {
@@ -75,8 +75,8 @@ function getFilterIcon(kind: FilterKind, value: string) {
   if (value === "all") {
     return {
       type: "emoji" as const,
-      value: "✨",
-      alt: "전체",
+      value: "*",
+      alt: "all",
     };
   }
 
@@ -88,10 +88,38 @@ function getFilterIcon(kind: FilterKind, value: string) {
     return getCategoryIcon(value);
   }
 
+  if (kind === "source") {
+    return getChannelIcon("youtube");
+  }
+
   return getSubcategoryIcon(value);
 }
 
-function hostLabel(taxonomy: ExternalResourceTaxonomy) {
+function getSourceFilterKey(article: KnowledgeArticle, taxonomy: ExternalResourceTaxonomy) {
+  if (taxonomy.channel !== "youtube") {
+    return null;
+  }
+
+  return article.externalSourceId ?? taxonomy.sourceName;
+}
+
+function getSourceFilterLabel(article: KnowledgeArticle, taxonomy: ExternalResourceTaxonomy) {
+  if (taxonomy.channel !== "youtube") {
+    return null;
+  }
+
+  return article.externalSourceLabel ?? taxonomy.sourceName;
+}
+
+function hostLabel(article: KnowledgeArticle, taxonomy: ExternalResourceTaxonomy) {
+  if (taxonomy.channel === "youtube") {
+    return (
+      article.externalSourceLabel ??
+      taxonomy.sourceName ??
+      taxonomy.channelLabel
+    );
+  }
+
   return taxonomy.domain
     ? taxonomy.domain.replace(/^www\./, "").toUpperCase()
     : taxonomy.sourceName.toUpperCase();
@@ -116,7 +144,7 @@ function FilterChipGroup({
 }) {
   const totalCount = options.reduce((sum, option) => sum + option.count, 0);
   const selectedOption = options.find((option) => option.value === value);
-  const items = [{ value: "all", label: "전체", count: totalCount }, ...options];
+  const items = [{ value: "all", label: "All", count: totalCount }, ...options];
 
   return (
     <div className="space-y-2">
@@ -233,6 +261,7 @@ export function KnowledgeExternalTrackView({
   );
 
   const [selectedChannel, setSelectedChannel] = useState("all");
+  const [selectedSource, setSelectedSource] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -248,13 +277,48 @@ export function KnowledgeExternalTrackView({
     [items],
   );
 
-  const categorySource = useMemo(
+  const channelSource = useMemo(
     () =>
       items.filter(
         ({ taxonomy }) =>
           selectedChannel === "all" || taxonomy.channel === selectedChannel,
       ),
     [items, selectedChannel],
+  );
+
+  const sourceOptions = useMemo(
+    () =>
+      buildOptions(
+        channelSource
+          .map(({ article, taxonomy }) => {
+            const value = getSourceFilterKey(article, taxonomy);
+            const label = getSourceFilterLabel(article, taxonomy);
+
+            if (!value || !label) {
+              return null;
+            }
+
+            return { value, label };
+          })
+          .filter((item): item is { value: string; label: string } => Boolean(item)),
+      ),
+    [channelSource],
+  );
+
+  const categorySource = useMemo(
+    () =>
+      channelSource.filter(({ article, taxonomy }) => {
+        if (selectedChannel !== "youtube") {
+          return true;
+        }
+
+        if (selectedSource === "all") {
+          return true;
+        }
+
+        return getSourceFilterKey(article, taxonomy) === selectedSource;
+      }),
+    [channelSource, selectedChannel, selectedSource],
   );
 
   const categoryOptions = useMemo(
@@ -300,16 +364,28 @@ export function KnowledgeExternalTrackView({
 
   const hasAdvancedSelection =
     selectedCategory !== "all" || selectedSubcategory !== "all";
-  const hasActiveFilters = selectedChannel !== "all" || hasAdvancedSelection;
+  const hasActiveFilters =
+    selectedChannel !== "all" ||
+    selectedSource !== "all" ||
+    hasAdvancedSelection;
   const selectedCategoryLabel =
     categoryOptions.find((option) => option.value === selectedCategory)?.label ??
     null;
   const selectedSubcategoryLabel =
     subcategoryOptions.find((option) => option.value === selectedSubcategory)
       ?.label ?? null;
+  const selectedSourceLabel =
+    sourceOptions.find((option) => option.value === selectedSource)?.label ?? null;
 
   function handleChannelChange(value: string) {
     setSelectedChannel(value);
+    setSelectedSource("all");
+    setSelectedCategory("all");
+    setSelectedSubcategory("all");
+  }
+
+  function handleSourceChange(value: string) {
+    setSelectedSource(value);
     setSelectedCategory("all");
     setSelectedSubcategory("all");
   }
@@ -333,6 +409,7 @@ export function KnowledgeExternalTrackView({
 
   function resetFilters() {
     setSelectedChannel("all");
+    setSelectedSource("all");
     setSelectedCategory("all");
     setSelectedSubcategory("all");
     setShowAdvancedFilters(false);
@@ -353,10 +430,10 @@ export function KnowledgeExternalTrackView({
 
           <div className="flex w-full flex-wrap items-center gap-2 text-sm lg:w-auto lg:justify-end">
             <span className="rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-3 py-1.5 text-xs font-semibold text-primary sm:px-3.5 sm:py-2 sm:text-sm">
-              리소스 {filteredItems.length}
+              Resources {filteredItems.length}
             </span>
             <span className="rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-3 py-1.5 text-xs font-semibold text-primary sm:px-3.5 sm:py-2 sm:text-sm">
-              채널 {channelOptions.length}
+              Channels {channelOptions.length}
             </span>
             <Button
               type="button"
@@ -365,7 +442,7 @@ export function KnowledgeExternalTrackView({
               onClick={() => setShowAdvancedFilters((current) => !current)}
             >
               <SlidersHorizontal className="size-3.5" />
-              {showAdvancedFilters ? "필터 접기" : "필터 더보기"}
+              {showAdvancedFilters ? "Hide Filters" : "Show Filters"}
               <ChevronDown
                 className={cn(
                   "size-3.5 transition-transform",
@@ -379,7 +456,7 @@ export function KnowledgeExternalTrackView({
                 onClick={resetFilters}
                 className="inline-flex h-9 w-full items-center justify-center rounded-full border border-[rgba(121,118,127,0.12)] bg-white px-3.5 text-sm font-semibold text-primary transition hover:border-[rgba(59,53,97,0.22)] hover:bg-[rgba(249,247,255,0.85)] sm:w-auto"
               >
-                초기화
+                Reset
               </button>
             ) : null}
           </div>
@@ -387,7 +464,7 @@ export function KnowledgeExternalTrackView({
 
         <div className="mt-4 space-y-3">
           <FilterChipGroup
-            label="채널"
+            label="Channel"
             kind="channel"
             value={selectedChannel}
             options={channelOptions}
@@ -398,28 +475,46 @@ export function KnowledgeExternalTrackView({
 
           {!showAdvancedFilters && hasAdvancedSelection ? (
             <div className="flex flex-wrap gap-2">
+              {selectedSourceLabel ? (
+                <TaxonomyPill
+                  icon={getChannelIcon("youtube")}
+                  label={`Source ${selectedSourceLabel}`}
+                  tone="channel"
+                />
+              ) : null}
               {selectedCategoryLabel ? (
                 <TaxonomyPill
                   icon={getCategoryIcon(selectedCategory)}
-                  label={`주제 ${selectedCategoryLabel}`}
+                  label={`Category ${selectedCategoryLabel}`}
                   tone="category"
                 />
               ) : null}
               {selectedSubcategoryLabel ? (
                 <TaxonomyPill
                   icon={getSubcategoryIcon(selectedSubcategory)}
-                  label={`도구 ${selectedSubcategoryLabel}`}
+                  label={`Subcategory ${selectedSubcategoryLabel}`}
                   tone="subcategory"
                 />
               ) : null}
             </div>
           ) : null}
 
+          {selectedChannel === "youtube" && sourceOptions.length > 0 ? (
+            <FilterChipGroup
+              label="YouTube Channel"
+              kind="source"
+              value={selectedSource}
+              options={sourceOptions}
+              onChange={handleSourceChange}
+              compact
+            />
+          ) : null}
+
           {showAdvancedFilters ? (
             <div className="rounded-[1.3rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(250,249,249,0.78)] px-3.5 py-3.5 sm:rounded-[1.4rem] sm:px-4 sm:py-4">
               <div className="space-y-4">
                 <FilterChipGroup
-                  label="주제"
+                  label="Category"
                   kind="category"
                   value={selectedCategory}
                   options={categoryOptions}
@@ -427,7 +522,7 @@ export function KnowledgeExternalTrackView({
                   compact
                 />
                 <FilterChipGroup
-                  label="도구"
+                  label="Subcategory"
                   kind="subcategory"
                   value={selectedSubcategory}
                   options={subcategoryOptions}
@@ -453,7 +548,7 @@ export function KnowledgeExternalTrackView({
                 <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                   <div className="flex min-w-0 items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary/52">
                     <BrandIcon icon={getChannelIcon(taxonomy.channel)} size={12} />
-                    <span className="truncate">{hostLabel(taxonomy)}</span>
+                    <span className="truncate">{hostLabel(article, taxonomy)}</span>
                   </div>
                   <span className="shrink-0 text-[11px] text-muted-foreground sm:text-xs">
                     {formatDate(article.publishedAt)}
@@ -494,7 +589,7 @@ export function KnowledgeExternalTrackView({
                       icon={
                         getTagIcon(tag) ?? {
                           type: "emoji",
-                          value: "🏷️",
+                          value: "*",
                           alt: tag,
                         }
                       }
@@ -506,8 +601,8 @@ export function KnowledgeExternalTrackView({
 
                 <div className="mt-6 grid gap-2 sm:flex sm:flex-wrap">
                   <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
-                    <Link href={`/knowledge/${article.slug}`}>
-                      노트 보기
+                    <Link href={`/knowledge/${article.slug}?id=${article.id}`}>
+                      Open Note
                       <ArrowRight className="size-4" />
                     </Link>
                   </Button>
@@ -518,7 +613,7 @@ export function KnowledgeExternalTrackView({
                         target="_blank"
                         rel="noreferrer"
                       >
-                        원문
+                        Open Source
                         <ExternalLink className="size-4" />
                       </Link>
                     </Button>
@@ -531,7 +626,7 @@ export function KnowledgeExternalTrackView({
       ) : (
         <section className="rounded-[1.6rem] border border-dashed border-[rgba(121,118,127,0.18)] bg-white px-5 py-8 text-center sm:rounded-[1.8rem] sm:px-6 sm:py-10">
           <p className="text-base font-semibold text-primary">
-            조건에 맞는 리소스가 없습니다.
+            No resources match this filter.
           </p>
           <Button
             type="button"
@@ -539,7 +634,7 @@ export function KnowledgeExternalTrackView({
             className="mt-4 rounded-full px-4"
             onClick={resetFilters}
           >
-            필터 초기화
+            Reset Filters
           </Button>
         </section>
       )}

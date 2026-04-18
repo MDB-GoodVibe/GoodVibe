@@ -12,8 +12,15 @@
     "db:apply:knowledge-expansion": "tsx scripts/apply-supabase-sql.ts supabase/migrations/202603260002_knowledge_expansion.sql",
     "db:apply:knowledge-ai-drafts": "tsx scripts/apply-supabase-sql.ts supabase/migrations/202603270003_knowledge_ai_drafts.sql",
     "db:apply:idea-board-refresh": "tsx scripts/apply-supabase-sql.ts supabase/migrations/202604060004_idea_board_refresh.sql",
+    "db:apply:youtube-sync": "tsx scripts/apply-supabase-sql.ts supabase/migrations/202604160006_youtube_external_sync.sql",
     "db:seed:good-vibe": "tsx scripts/seed-good-vibe.ts",
-    "db:bootstrap:good-vibe": "npm run db:apply:init && npm run db:apply:knowledge-expansion && npm run db:apply:knowledge-ai-drafts && npm run db:apply:idea-board-refresh && npm run db:seed:good-vibe"
+    "db:bootstrap:good-vibe": "npm run db:apply:init && npm run db:apply:knowledge-expansion && npm run db:apply:knowledge-ai-drafts && npm run db:apply:idea-board-refresh && npm run db:apply:youtube-sync && npm run db:seed:good-vibe",
+    "youtube:sync:daily": "node --experimental-strip-types --import ./tests/register-alias.mjs scripts/run-youtube-daily-sync.ts",
+    "youtube:resummarize": "tsx scripts/rerun-youtube-summaries.ts",
+    "youtube:reset:rerun": "tsx scripts/reset-youtube-and-rerun-sync.ts",
+    "youtube:codex:collect": "node --experimental-strip-types --import ./tests/register-alias.mjs scripts/youtube-codex-collect.ts",
+    "youtube:codex:publish": "node --experimental-strip-types scripts/youtube-codex-publish.ts",
+    "youtube:codex:validate-drafts": "node --experimental-strip-types scripts/youtube-codex-validate-drafts.ts"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -34,6 +41,7 @@
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {

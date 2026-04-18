@@ -553,6 +553,65 @@ body::before {
   opacity: 8%;
 }
 
+.global-top-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  height: 3px;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.global-top-loader::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 34%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #dd7373 0%, #51a3a3 100%);
+  transform: translateX(-100%);
+}
+
+.global-top-loader.is-active {
+  opacity: 1;
+}
+
+.global-top-loader.is-active::before {
+  animation: global-loader-slide 1.05s ease-in-out infinite;
+}
+
+.global-loading-chip {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(121, 118, 127, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: rgba(37, 31, 74, 0.92);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  padding: 0.42rem 0.72rem;
+  box-shadow: 0 12px 28px rgba(37, 31, 74, 0.12);
+  backdrop-filter: blur(6px);
+}
+
+.global-loading-spinner {
+  width: 0.86rem;
+  height: 0.86rem;
+  border-radius: 999px;
+  border: 2px solid rgba(59, 53, 97, 0.24);
+  border-top-color: rgba(221, 115, 115, 0.98);
+  animation: global-spin 0.7s linear infinite;
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -571,6 +630,24 @@ body::before {
   }
   50% {
     transform: translateY(-8px);
+  }
+}
+
+@keyframes global-loader-slide {
+  0% {
+    transform: translateX(-115%);
+  }
+  50% {
+    transform: translateX(145%);
+  }
+  100% {
+    transform: translateX(280%);
+  }
+}
+
+@keyframes global-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 

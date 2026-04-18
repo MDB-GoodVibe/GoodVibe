@@ -13,6 +13,10 @@ import {
   hydrateWorkspaceDraft,
   updateWorkspaceIdea,
 } from "@/lib/workspace-draft-store";
+import {
+  filterNewYouTubeVideoIds,
+  parseYouTubeChannelInput,
+} from "@/lib/youtube/utils";
 
 function run(name: string, fn: () => void) {
   fn();
@@ -109,6 +113,36 @@ run("classifyExternalResource infers blog database taxonomy", () => {
   assert.equal(taxonomy?.channel, "blog");
   assert.equal(taxonomy?.category, "database");
   assert.equal(taxonomy?.subcategory, "supabase");
+});
+
+run("parseYouTubeChannelInput supports handle and channel url", () => {
+  const fromHandle = parseYouTubeChannelInput("@fireship");
+  assert.equal(fromHandle.handle, "fireship");
+  assert.equal(fromHandle.channelId, null);
+
+  const fromChannelUrl = parseYouTubeChannelInput(
+    "https://www.youtube.com/channel/UCsBjURrPoezykLs9EqgamOA",
+  );
+  assert.equal(fromChannelUrl.channelId, "UCsBjURrPoezykLs9EqgamOA");
+  assert.equal(fromChannelUrl.handle, null);
+});
+
+run("parseYouTubeChannelInput supports watch url and youtu.be short url", () => {
+  const fromWatchUrl = parseYouTubeChannelInput(
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  );
+  assert.equal(fromWatchUrl.watchVideoId, "dQw4w9WgXcQ");
+
+  const fromShortUrl = parseYouTubeChannelInput("https://youtu.be/dQw4w9WgXcQ");
+  assert.equal(fromShortUrl.watchVideoId, "dQw4w9WgXcQ");
+});
+
+run("filterNewYouTubeVideoIds removes duplicates and existing ids", () => {
+  const ids = ["videoA", "videoB", "videoA", "videoC"];
+  const existing = new Set(["videoB"]);
+  const next = filterNewYouTubeVideoIds(ids, existing);
+
+  assert.deepEqual(next, ["videoA", "videoC"]);
 });
 
 run("workspace draft hydration recomputes derived artifacts", () => {
