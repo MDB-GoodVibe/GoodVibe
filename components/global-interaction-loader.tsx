@@ -44,49 +44,151 @@ function isNavigableAnchor(target: EventTarget | null) {
 
 export function GlobalInteractionLoader() {
   const pathname = usePathname();
-  const [isLoading, setIsLoading] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
+  const [pendingCount, setPendingCount] = useState(0);
+  const pendingCountRef = useRef(0);
+  const interactionCountRef = useRef(0);
+  const interactionTimeoutRef = useRef<number | null>(null);
+  const lastPathnameRef = useRef(pathname);
+
+  const isLoading = pendingCount > 0;
 
   useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading) {
-      return;
+    function syncPendingCount(value: number) {
+      pendingCountRef.current = Math.max(0, value);
+      setPendingCount(pendingCountRef.current);
     }
 
-    const settleTimer = window.setTimeout(() => {
-      setIsLoading(false);
-
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    }, 0);
-
-    return () => {
-      window.clearTimeout(settleTimer);
-    };
-  }, [pathname, isLoading]);
-
-  useEffect(() => {
-    function startLoading() {
-      setIsLoading(true);
-
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = window.setTimeout(() => {
-        setIsLoading(false);
-        timeoutRef.current = null;
-      }, 15000);
+    function beginPending() {
+      syncPendingCount(pendingCountRef.current + 1);
     }
+
+    function endPending() {
+      syncPendingCount(pendingCountRef.current - 1);
+    }
+
+    function beginInteractionPending() {
+      interactionCountRef.current += 1;
+      beginPending();
+
+      if (interactionTimeoutRef.current) {
+        window.clearTimeout(interactionTimeoutRef.current);
+      }
+
+      interactionTimeoutRef.current = window.setTimeout(() => {
+        const interactionCount = interactionCountRef.current;
+        interactionCountRef.current = 0;
+
+        if (interactionCount > 0) {
+          syncPendingCount(pendingCountRef.current - interactionCount);
+        }
+
+        interactionTimeoutRef.current = null;
+      }, 20000);
+    }
+
+    function shouldTrackFetch(input: RequestInfo | URL, init?: RequestInit) {
+      const method = (init?.method ?? "GET").toUpperCase();
+
+      let url: URL;
+      try {
+        const raw = input instanceof Request ? input.url : String(input);
+        url = new URL(raw, window.location.href);
+      } catch {
+        return false;
+      }
+
+      if (url.origin !== window.location.origin) {
+        return false;
+      }
+
+      if (url.pathname.startsWith("/_next/")) {
+        return false;
+      }
+
+      if (method !== "GET") {
+        return true;
+      }
+
+      return url.pathname.startsWith("/api/");
+    }
+
+    function shouldTrackXhr(urlString: string, method: string) {
+      let url: URL;
+
+      try {
+        url = new URL(urlString, window.location.href);
+      } catch {
+        return false;
+      }
+
+      if (url.origin !== window.location.origin) {
+        return false;
+      }
+
+      if (url.pathname.startsWith("/_next/")) {
+        return false;
+      }
+
+      if (method.toUpperCase() !== "GET") {
+        return true;
+      }
+
+      return url.pathname.startsWith("/api/");
+    }
+
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const track = shouldTrackFetch(input, init);
+
+      if (track) {
+        beginPending();
+      }
+
+      try {
+        return await originalFetch(input, init);
+      } finally {
+        if (track) {
+          endPending();
+        }
+      }
+    };
+
+    const originalXhrOpen = XMLHttpRequest.prototype.open;
+    const originalXhrSend = XMLHttpRequest.prototype.send;
+
+    XMLHttpRequest.prototype.open = function (
+      method: string,
+      url: string | URL,
+      async?: boolean,
+      username?: string | null,
+      password?: string | null,
+    ) {
+      (this as XMLHttpRequest & { __trackPendingRequest?: boolean }).__trackPendingRequest =
+        shouldTrackXhr(String(url), method);
+      return originalXhrOpen.call(this, method, url, async ?? true, username, password);
+    };
+
+    XMLHttpRequest.prototype.send = function (
+      body?: Document | XMLHttpRequestBodyInit | null,
+    ) {
+      const shouldTrack = Boolean(
+        (this as XMLHttpRequest & { __trackPendingRequest?: boolean })
+          .__trackPendingRequest,
+      );
+
+      if (shouldTrack) {
+        beginPending();
+        this.addEventListener(
+          "loadend",
+          () => {
+            endPending();
+          },
+          { once: true },
+        );
+      }
+
+      return originalXhrSend.call(this, body);
+    };
 
     function handleClick(event: MouseEvent) {
       if (event.defaultPrevented) {
@@ -102,12 +204,12 @@ export function GlobalInteractionLoader() {
       }
 
       if (isNavigableAnchor(event.target)) {
-        startLoading();
+        beginInteractionPending();
       }
     }
 
     function handleSubmit() {
-      startLoading();
+      beginInteractionPending();
     }
 
     document.addEventListener("click", handleClick, true);
@@ -116,8 +218,35 @@ export function GlobalInteractionLoader() {
     return () => {
       document.removeEventListener("click", handleClick, true);
       document.removeEventListener("submit", handleSubmit, true);
+
+      if (interactionTimeoutRef.current) {
+        window.clearTimeout(interactionTimeoutRef.current);
+      }
+
+      window.fetch = originalFetch;
+      XMLHttpRequest.prototype.open = originalXhrOpen;
+      XMLHttpRequest.prototype.send = originalXhrSend;
     };
   }, []);
+
+  useEffect(() => {
+    if (pathname !== lastPathnameRef.current) {
+      const interactionCount = interactionCountRef.current;
+      interactionCountRef.current = 0;
+
+      if (interactionCount > 0) {
+        pendingCountRef.current = Math.max(0, pendingCountRef.current - interactionCount);
+        setPendingCount(pendingCountRef.current);
+      }
+
+      if (interactionTimeoutRef.current) {
+        window.clearTimeout(interactionTimeoutRef.current);
+        interactionTimeoutRef.current = null;
+      }
+
+      lastPathnameRef.current = pathname;
+    }
+  }, [pathname]);
 
   return (
     <>
@@ -126,14 +255,13 @@ export function GlobalInteractionLoader() {
         className={`global-top-loader ${isLoading ? "is-active" : ""}`}
       />
       {isLoading ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className="global-loading-chip"
-        >
-          <span className="global-loading-spinner" />
-          처리 중...
-        </div>
+        <>
+          <div className="global-loading-overlay" aria-hidden="true" />
+          <div role="status" aria-live="polite" className="global-loading-chip">
+            <span className="global-loading-spinner" />
+            Loading...
+          </div>
+        </>
       ) : null}
     </>
   );

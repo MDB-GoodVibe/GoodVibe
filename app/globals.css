@@ -585,9 +585,10 @@ body::before {
 
 .global-loading-chip {
   position: fixed;
-  top: 0.9rem;
-  right: 0.9rem;
-  z-index: 90;
+  top: 50%;
+  left: 50%;
+  z-index: 92;
+  transform: translate(-50%, -50%);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -601,6 +602,14 @@ body::before {
   padding: 0.42rem 0.72rem;
   box-shadow: 0 12px 28px rgba(37, 31, 74, 0.12);
   backdrop-filter: blur(6px);
+}
+
+.global-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 91;
+  background: rgba(250, 249, 249, 0.62);
+  backdrop-filter: blur(2px);
 }
 
 .global-loading-spinner {
