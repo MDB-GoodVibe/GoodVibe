@@ -36,15 +36,81 @@ function searchMatches(item: ExternalCatalogItem, query: string) {
 }
 
 function dedupeCatalogItems(items: ExternalCatalogItem[]) {
-  const byId = new Map<string, ExternalCatalogItem>();
+  const sourcePriority: Record<ExternalCatalogItem["source"], number> = {
+    "skills-sh": 1,
+    "claude-marketplaces": 2,
+  };
+  const byIdentity = new Map<string, ExternalCatalogItem>();
 
-  for (const item of items) {
-    if (!byId.has(item.id)) {
-      byId.set(item.id, item);
-    }
+  function normalizeToken(value: string) {
+    return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
   }
 
-  return [...byId.values()];
+  function normalizeSkillSlug(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return "";
+    }
+
+    const parts = trimmed.split("/").filter(Boolean);
+    return parts[parts.length - 1] ?? trimmed;
+  }
+
+  function buildIdentity(item: ExternalCatalogItem) {
+    if (item.kind !== "skills") {
+      return `id:${item.id}`;
+    }
+
+    const normalizedSlug = normalizeToken(normalizeSkillSlug(item.slug));
+    const normalizedTitle = normalizeToken(item.title);
+    const normalizedOwner = normalizeToken(item.owner);
+
+    if (normalizedSlug) {
+      return `skills:slug:${normalizedSlug}`;
+    }
+
+    if (normalizedTitle) {
+      return `skills:title:${normalizedTitle}`;
+    }
+
+    return `skills:owner:${normalizedOwner}`;
+  }
+
+  function pickPreferred(
+    current: ExternalCatalogItem,
+    incoming: ExternalCatalogItem,
+  ) {
+    const currentPriority = sourcePriority[current.source] ?? 0;
+    const incomingPriority = sourcePriority[incoming.source] ?? 0;
+
+    if (incomingPriority > currentPriority) {
+      return incoming;
+    }
+
+    if (incomingPriority < currentPriority) {
+      return current;
+    }
+
+    if (incoming.popularityValue > current.popularityValue) {
+      return incoming;
+    }
+
+    return current;
+  }
+
+  for (const item of items) {
+    const identity = buildIdentity(item);
+    const existing = byIdentity.get(identity);
+
+    if (!existing) {
+      byIdentity.set(identity, item);
+      continue;
+    }
+
+    byIdentity.set(identity, pickPreferred(existing, item));
+  }
+
+  return [...byIdentity.values()];
 }
 
 function filterBySource(
@@ -185,11 +251,10 @@ export async function getExploreCatalog(
       : await fetchSkillsCatalog(query);
 
   const filteredItems = sortItems(
-    filterBySource(
-      dedupeCatalogItems(response.items).filter((item) =>
+    dedupeCatalogItems(
+      filterBySource(response.items, query.source).filter((item) =>
         searchMatches(item, normalizedQuery),
       ),
-      query.source,
     ),
     normalizedQuery,
   ).slice(0, cappedLimit);

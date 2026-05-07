@@ -27,12 +27,15 @@ import {
   setWorkspacePromptStage,
   setWorkspaceSection,
   toggleWorkspaceSkill,
+  updateSuperpowersStatus,
   updateWorkspaceIdea,
   updateWorkspaceOptions,
+  updateWorkspacePlanningBrief,
   updateWorkspaceProjectName,
 } from "@/lib/workspace-draft-store";
 import type {
   ArchitectureOptions,
+  PlanningBrief,
   SavedProject,
   SelectedSkill,
   WorkspaceDraft,
@@ -49,6 +52,14 @@ interface WorkspaceContextValue {
   isReadyToSave: boolean;
   isSavingProject: boolean;
   setProjectName: (value: string, section?: WorkspaceSection) => void;
+  setPlanningBrief: (
+    brief: Partial<PlanningBrief>,
+    section?: WorkspaceSection,
+  ) => void;
+  setSuperpowersStatus: (
+    status: WorkspaceDraft["superpowersStatus"],
+    section?: WorkspaceSection,
+  ) => void;
   setIdea: (value: string, section?: WorkspaceSection) => void;
   analyzeIdea: (section?: WorkspaceSection) => void;
   selectServiceType: (
@@ -84,6 +95,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [isSavingProject, setIsSavingProject] = useState(false);
 
   useEffect(() => {
+    const navEntry = performance.getEntriesByType("navigation")[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+
+    if (navEntry?.type === "reload") {
+      clearWorkspaceDraft();
+      setDraft(createEmptyWorkspaceDraft());
+      setIsHydrated(true);
+      return;
+    }
+
     setDraft(loadWorkspaceDraft());
     setIsHydrated(true);
   }, []);
@@ -113,6 +135,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     setProjectName(nextProjectName, section = draft.lastVisitedSection) {
       setDraft((currentDraft) =>
         updateWorkspaceProjectName(currentDraft, nextProjectName, section),
+      );
+    },
+    setPlanningBrief(brief, section = "planning") {
+      setSavedProjectId(null);
+      setDraft((currentDraft) =>
+        updateWorkspacePlanningBrief(currentDraft, brief, section),
+      );
+    },
+    setSuperpowersStatus(status, section = "planning") {
+      setSavedProjectId(null);
+      setDraft((currentDraft) =>
+        updateSuperpowersStatus(currentDraft, status, section),
       );
     },
     setIdea(nextIdea, section = "idea") {

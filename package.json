@@ -20,7 +20,8 @@
     "youtube:reset:rerun": "tsx scripts/reset-youtube-and-rerun-sync.ts",
     "youtube:codex:collect": "node --experimental-strip-types --import ./tests/register-alias.mjs scripts/youtube-codex-collect.ts",
     "youtube:codex:publish": "node --experimental-strip-types scripts/youtube-codex-publish.ts",
-    "youtube:codex:validate-drafts": "node --experimental-strip-types scripts/youtube-codex-validate-drafts.ts"
+    "youtube:codex:validate-drafts": "node --experimental-strip-types scripts/youtube-codex-validate-drafts.ts",
+    "knowledge:refresh:detailed": "tsx scripts/refresh-detailed-knowledge-guides.ts"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",

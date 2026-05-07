@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -66,11 +66,7 @@ const mainTabs = [
   { href: "/helper/idea", label: "바이브 헬퍼", match: ["/helper"] },
 ] as const;
 
-function matchesPath(
-  pathname: string,
-  candidates: readonly string[],
-  exact = false,
-) {
+function matchesPath(pathname: string, candidates: readonly string[], exact = false) {
   return candidates.some((candidate) => {
     if (pathname === candidate) {
       return true;
@@ -84,11 +80,7 @@ function matchesPath(
   });
 }
 
-function isActiveMainTab(
-  pathname: string,
-  href: string,
-  matches?: readonly string[],
-) {
+function isActiveMainTab(pathname: string, href: string, matches?: readonly string[]) {
   return matchesPath(pathname, matches ?? [href]);
 }
 
@@ -123,10 +115,7 @@ function getSection(pathname: string) {
   return null;
 }
 
-function getSidebarConfig(
-  section: ReturnType<typeof getSection>,
-  isAdmin: boolean,
-) {
+function getSidebarConfig(section: ReturnType<typeof getSection>, isAdmin: boolean) {
   switch (section) {
     case "knowledge":
       return {
@@ -136,31 +125,11 @@ function getSidebarConfig(
         groups: [
           {
             items: [
-              {
-                href: "/knowledge/basics",
-                label: "기초 가이드",
-                icon: BookOpen,
-              },
-              {
-                href: "/knowledge/level-up",
-                label: "레벨업",
-                icon: ArrowUpRight,
-              },
-              {
-                href: "/knowledge/tips",
-                label: "팁 모음",
-                icon: Lightbulb,
-              },
-              {
-                href: "/knowledge/skills",
-                label: "스킬 정보",
-                icon: WandSparkles,
-              },
-              {
-                href: "/knowledge/external",
-                label: "외부 리소스",
-                icon: ExternalLink,
-              },
+              { href: "/knowledge/basics", label: "기초 가이드", icon: BookOpen },
+              { href: "/knowledge/level-up", label: "레벨업", icon: ArrowUpRight },
+              { href: "/knowledge/tips", label: "팁 모음", icon: Lightbulb },
+              { href: "/knowledge/skills", label: "스킬 정보", icon: WandSparkles },
+              { href: "/knowledge/external", label: "외부 리소스", icon: ExternalLink },
             ],
           },
           ...(isAdmin
@@ -196,8 +165,7 @@ function getSidebarConfig(
         ],
         callout: {
           title: "지식 제보하기",
-          description:
-            "새로운 인사이트나 유용한 링크를 관리자에게 추천해 보세요.",
+          description: "새로운 인사이트나 유용한 링크를 관리자에게 추천해 보세요.",
           actionLabel: "기여하기",
           href: "/knowledge/contribute",
         },
@@ -210,6 +178,17 @@ function getSidebarConfig(
         icon: Settings2,
         groups: [
           {
+            title: "지식베이스",
+            items: [
+              { href: "/knowledge/basics", label: "기초 가이드", icon: BookOpen },
+              { href: "/knowledge/level-up", label: "레벨업", icon: ArrowUpRight },
+              { href: "/knowledge/tips", label: "팁 모음", icon: Lightbulb },
+              { href: "/knowledge/skills", label: "스킬 정보", icon: WandSparkles },
+              { href: "/knowledge/external", label: "외부 리소스", icon: ExternalLink },
+            ],
+          },
+          {
+            title: "운영",
             items: [
               {
                 href: "/admin/knowledge",
@@ -470,12 +449,7 @@ export function ServiceShell({ children }: { children: ReactNode }) {
                             >
                               <Icon className="size-4" />
                             </div>
-                            <span
-                              className={cn(
-                                "text-[13px]",
-                                active ? "font-semibold" : "font-medium",
-                              )}
-                            >
+                            <span className={cn("text-[13px]", active ? "font-semibold" : "font-medium")}>
                               {item.label}
                             </span>
                           </Link>
@@ -488,16 +462,12 @@ export function ServiceShell({ children }: { children: ReactNode }) {
 
               {sidebarConfig.callout ? (
                 <div className="mt-7 rounded-[1.7rem] border border-[rgba(255,107,108,0.22)] bg-[rgba(255,107,108,0.06)] px-5 py-5 text-primary">
-                  <p className="text-lg font-bold tracking-[-0.03em]">
-                    {sidebarConfig.callout.title}
-                  </p>
+                  <p className="text-lg font-bold tracking-[-0.03em]">{sidebarConfig.callout.title}</p>
                   <p className="mt-2 text-[13px] leading-6 text-muted-foreground">
                     {sidebarConfig.callout.description}
                   </p>
                   <Button asChild variant="secondary" className="mt-5 w-full">
-                    <Link href={sidebarConfig.callout.href}>
-                      {sidebarConfig.callout.actionLabel}
-                    </Link>
+                    <Link href={sidebarConfig.callout.href}>{sidebarConfig.callout.actionLabel}</Link>
                   </Button>
                 </div>
               ) : null}

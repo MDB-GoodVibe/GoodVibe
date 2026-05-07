@@ -24,9 +24,9 @@ function parseCompactNumber(value: string) {
   return Math.round(numericValue * multiplier);
 }
 
-function toTitleSummary(skillName: string, repo: string) {
-  const name = skillName.replaceAll("-", " ");
-  return `${repo}에서 제공하는 ${name} 관련 인기 스킬입니다.`;
+function toTitleSummary(skillName: string, repo: string, installs: string) {
+  const readable = skillName.replaceAll("-", " ");
+  return `${repo} 저장소에서 제공하는 ${readable} 스킬입니다. 설치 수 ${installs} 기준으로 많이 사용되는 항목이며, 설치 명령으로 바로 적용할 수 있습니다.`;
 }
 
 export function parseSkillsShList(
@@ -63,7 +63,7 @@ export function parseSkillsShList(
       source: "skills-sh",
       sourceLabel: "skills.sh",
       title,
-      summary: toTitleSummary(title, repoText),
+      summary: toTitleSummary(title, repoText, popularityText),
       owner,
       repo,
       slug: skillSlug,
@@ -71,9 +71,9 @@ export function parseSkillsShList(
       repoUrl: `https://github.com/${repo}`,
       installCommand: `npx skills add https://github.com/${repo} --skill ${skillSlug}`,
       tags: [...new Set(skillSlug.split("-"))],
-      categories: sort === "popular" ? ["인기"] : [sort],
+      categories: sort === "popular" ? ["popular"] : [sort],
       popularityValue: parseCompactNumber(popularityText),
-      popularityLabel: `${popularityText} 설치`,
+      popularityLabel: `${popularityText} installs`,
     });
   });
 

@@ -26,11 +26,6 @@ const ideaStopwords = new Set([
   "screen",
   "feature",
   "idea",
-  "서비스",
-  "화면",
-  "기능",
-  "프로젝트",
-  "사용자",
 ]);
 
 function extractIdeaKeywords(idea: string) {
@@ -38,16 +33,21 @@ function extractIdeaKeywords(idea: string) {
     .toLowerCase()
     .split(/[^\p{L}\p{N}-]+/u)
     .filter((keyword) => keyword.length >= 2 && !ideaStopwords.has(keyword))
-    .slice(0, 10);
+    .slice(0, 12);
 }
 
 function buildDraftKeywords(draft: WorkspaceDraft, section: WorkspaceSection) {
   const selectedServiceType = getSelectedServiceType(draft);
   const keywords = new Set<string>(extractIdeaKeywords(draft.idea));
 
+  for (const value of Object.values(draft.planningBrief)) {
+    for (const token of extractIdeaKeywords(value)) {
+      keywords.add(token);
+    }
+  }
+
   if (selectedServiceType) {
     keywords.add(selectedServiceType.name.toLowerCase());
-
     for (const tag of selectedServiceType.tags) {
       keywords.add(tag.toLowerCase());
     }
@@ -71,9 +71,10 @@ function buildDraftKeywords(draft: WorkspaceDraft, section: WorkspaceSection) {
     keywords.add("deployment");
   }
 
-  if (draft.options.budget === "free") {
-    keywords.add("free");
-    keywords.add("open-source");
+  if (section === "planning") {
+    keywords.add("planning");
+    keywords.add("brainstorming");
+    keywords.add("superpowers");
   }
 
   if (section === "prompts") {
@@ -112,25 +113,18 @@ function getItemScore(
     .toLowerCase();
 
   let score = Math.log10(item.popularityValue + 10);
-
   for (const keyword of keywords) {
     if (haystack.includes(keyword)) {
-      score += 3;
+      score += 2.5;
     }
   }
 
-  if (section === "architecture" && item.kind === "skills") {
-    score += 1;
+  if (section === "skills" && item.installCommand) {
+    score += 2;
   }
-
   if (section === "prompts" && item.installCommand) {
     score += 1.5;
   }
-
-  if (section === "skills" && item.installCommand) {
-    score += 1.8;
-  }
-
   if (item.source === "skills-sh" && section !== "projects") {
     score += 0.5;
   }
@@ -144,15 +138,12 @@ export function rankCatalogItemsForDraft(
   section: WorkspaceSection,
 ) {
   const keywords = buildDraftKeywords(draft, section);
-
   return [...items].sort((left, right) => {
     const leftScore = getItemScore(left, keywords, section);
     const rightScore = getItemScore(right, keywords, section);
-
     if (rightScore !== leftScore) {
       return rightScore - leftScore;
     }
-
     return right.popularityValue - left.popularityValue;
   });
 }

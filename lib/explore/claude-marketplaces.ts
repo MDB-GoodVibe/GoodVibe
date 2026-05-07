@@ -78,6 +78,23 @@ function formatCompactNumber(value: number) {
   }).format(value);
 }
 
+function getSlugTail(slug: string) {
+  const parts = slug.split("/").filter(Boolean);
+  return parts[parts.length - 1] ?? slug;
+}
+
+function toSkillSummary(input: {
+  title: string;
+  repo: string;
+  installs: number;
+  stars: number;
+}) {
+  const installsText = input.installs > 0 ? formatCompactNumber(input.installs) : "0";
+  const starsText = input.stars > 0 ? formatCompactNumber(input.stars) : "0";
+
+  return `${input.repo} 저장소 기반의 ${input.title} 스킬입니다. 커뮤니티 지표 기준 설치 ${installsText}, 스타 ${starsText} 수준이며, 실무 작업 자동화를 위해 재사용 가능한 스킬 패턴을 제공합니다.`;
+}
+
 export function parseClaudeSkillsFromHtml(html: string): ExternalCatalogItem[] {
   const payloads = parseRscPayloadStrings(html);
   const skills = extractJsonArray(payloads, '"skills":[');
@@ -85,39 +102,39 @@ export function parseClaudeSkillsFromHtml(html: string): ExternalCatalogItem[] {
   return skills.reduce<ExternalCatalogItem[]>((items, entry) => {
     const repo = String(entry.repo ?? "");
     const [owner = ""] = repo.split("/");
-    const id = String(entry.id ?? "");
-    const slug = String(entry.path ?? entry.name ?? "");
+    const rawSlug = String(entry.path ?? entry.name ?? "");
+    const slug = getSlugTail(rawSlug);
     const installs = Number(entry.installs ?? 0);
     const stars = Number(entry.stars ?? 0);
     const title = String(entry.name ?? slug);
 
-    if (!id || !title || !repo) {
+    if (!title || !repo) {
       return items;
     }
 
     items.push({
-      id: `claude-marketplaces:skills:${id}`,
+      id: `claude-marketplaces:skills:${repo}/${slug}`,
       kind: "skills",
       source: "claude-marketplaces",
       sourceLabel: "Claude Marketplaces",
       title,
-      summary: `${title} 관련 커뮤니티 디렉터리 항목입니다.`,
+      summary: toSkillSummary({ title, repo, installs, stars }),
       owner,
       repo,
       slug,
-      url: `https://claudemarketplaces.com/skills/${id}`,
+      url: `https://claudemarketplaces.com/skills/${slug}`,
       repoUrl: `https://github.com/${repo}`,
       installCommand:
         typeof entry.installCommand === "string"
           ? entry.installCommand
           : undefined,
       tags: [...new Set(`${title} ${repo}`.split(/[-/\s]+/).filter(Boolean))],
-      categories: ["커뮤니티"],
+      categories: ["community"],
       popularityValue: installs > 0 ? installs : stars,
       popularityLabel:
         installs > 0
-          ? `${formatCompactNumber(installs)} 설치`
-          : `${formatCompactNumber(stars)} 스타`,
+          ? `${formatCompactNumber(installs)} installs`
+          : `${formatCompactNumber(stars)} stars`,
     });
 
     return items;
@@ -154,7 +171,7 @@ export function parseClaudeMarketplacesFromHtml(
       source: "claude-marketplaces",
       sourceLabel: "Claude Marketplaces",
       title,
-      summary: `${repo} 관련 플러그인 묶음을 모아둔 커뮤니티 마켓 항목입니다.`,
+      summary: `${repo} 관련 플러그인을 모아두는 마켓플레이스 항목입니다. 포함 플러그인 ${pluginCount}개, 저장소 스타 ${formatCompactNumber(stars)} 기준으로 정렬됩니다.`,
       owner,
       repo,
       slug,
@@ -163,7 +180,7 @@ export function parseClaudeMarketplacesFromHtml(
       tags,
       categories,
       popularityValue: stars + pluginCount * 1_000,
-      popularityLabel: `${pluginCount}개 플러그인 / ${formatCompactNumber(stars)} 스타`,
+      popularityLabel: `${pluginCount} plugins / ${formatCompactNumber(stars)} stars`,
     });
 
     return items;

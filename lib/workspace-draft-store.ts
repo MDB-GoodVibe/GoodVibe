@@ -5,6 +5,7 @@ import { generatePromptStages } from "@/lib/prompt-generator";
 import type {
   ArchitectureOptions,
   DraftCompletionState,
+  PlanningBrief,
   SavedProject,
   SelectedSkill,
   ServiceTypeRecommendation,
@@ -21,10 +22,35 @@ const defaultOptions: ArchitectureOptions = {
   environment: "local",
 };
 
+const defaultPlanningBrief: PlanningBrief = {
+  problem: "",
+  targetUser: "",
+  userJourney: "",
+  mvpScope: "",
+  outOfScope: "",
+  successCriteria: "",
+  constraints: "",
+};
+
+function normalizeToken(value: string) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function getSkillIdentity(skill: SelectedSkill) {
+  const normalizedId = normalizeToken(skill.id);
+  const idParts = normalizedId.split(":");
+  const trailingId = idParts[idParts.length - 1] ?? normalizedId;
+  const idSlug = trailingId.split("/").pop() ?? trailingId;
+  const normalizedTitle = normalizeToken(skill.title);
+  return idSlug || normalizedTitle;
+}
+
 export function createEmptyWorkspaceDraft(): WorkspaceDraft {
   return {
     projectName: "",
     idea: "",
+    planningBrief: { ...defaultPlanningBrief },
+    superpowersStatus: "not_installed",
     sourceIdeaId: null,
     sourceIdeaTitle: null,
     analysis: null,
@@ -34,7 +60,7 @@ export function createEmptyWorkspaceDraft(): WorkspaceDraft {
     selectedSkills: [],
     promptStages: [],
     activePromptStage: DEFAULT_PROMPT_STAGE,
-    lastVisitedSection: "idea",
+    lastVisitedSection: "planning",
     updatedAt: null,
   };
 }
@@ -45,6 +71,11 @@ export function getSelectedServiceType(draft: WorkspaceDraft) {
       (serviceType) => serviceType.id === draft.selectedTypeId,
     ) ?? null
   );
+}
+
+function hasPlanningBriefInput(planningBrief: PlanningBrief) {
+  const values = Object.values(planningBrief);
+  return values.some((value) => value.trim().length > 0);
 }
 
 function recomputeDerivedArtifacts(draft: WorkspaceDraft): WorkspaceDraft {
@@ -78,6 +109,8 @@ function recomputeDerivedArtifacts(draft: WorkspaceDraft): WorkspaceDraft {
     design: draft.options.design,
     environment: draft.options.environment,
     selectedSkills: draft.selectedSkills,
+    planningBrief: draft.planningBrief,
+    superpowersStatus: draft.superpowersStatus,
   });
 
   const hasActivePrompt = promptStages.some(
@@ -98,7 +131,6 @@ export function hydrateWorkspaceDraft(
   value?: Partial<WorkspaceDraft> | null,
 ): WorkspaceDraft {
   const base = createEmptyWorkspaceDraft();
-
   const draft: WorkspaceDraft = {
     ...base,
     ...value,
@@ -106,11 +138,16 @@ export function hydrateWorkspaceDraft(
       ...base.options,
       ...(value?.options ?? {}),
     },
+    planningBrief: {
+      ...base.planningBrief,
+      ...(value?.planningBrief ?? {}),
+    },
+    superpowersStatus: value?.superpowersStatus ?? base.superpowersStatus,
     analysis: value?.analysis ?? null,
     architecture: value?.architecture ?? null,
     promptStages: value?.promptStages ?? [],
     activePromptStage: value?.activePromptStage ?? DEFAULT_PROMPT_STAGE,
-    lastVisitedSection: value?.lastVisitedSection ?? "idea",
+    lastVisitedSection: value?.lastVisitedSection ?? "planning",
     sourceIdeaId: value?.sourceIdeaId ?? null,
     sourceIdeaTitle: value?.sourceIdeaTitle ?? null,
     selectedTypeId: value?.selectedTypeId ?? null,
@@ -136,6 +173,7 @@ export function createAnalyzedWorkspaceDraft(
     idea: draft.idea,
     projectName: draft.projectName,
     prioritizeFreeTools: draft.options.budget === "free",
+    planningBrief: draft.planningBrief,
   });
 
   return hydrateWorkspaceDraft({
@@ -147,13 +185,44 @@ export function createAnalyzedWorkspaceDraft(
   });
 }
 
+export function updateWorkspacePlanningBrief(
+  draft: WorkspaceDraft,
+  partialBrief: Partial<PlanningBrief>,
+  currentSection: WorkspaceSection = "planning",
+) {
+  return hydrateWorkspaceDraft({
+    ...draft,
+    planningBrief: {
+      ...draft.planningBrief,
+      ...partialBrief,
+    },
+    analysis: null,
+    selectedTypeId: null,
+    selectedSkills: [],
+    lastVisitedSection: currentSection,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+export function updateSuperpowersStatus(
+  draft: WorkspaceDraft,
+  status: WorkspaceDraft["superpowersStatus"],
+  currentSection: WorkspaceSection = "planning",
+) {
+  return hydrateWorkspaceDraft({
+    ...draft,
+    superpowersStatus: status,
+    lastVisitedSection: currentSection,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
 export function updateWorkspaceIdea(
   draft: WorkspaceDraft,
   idea: string,
   currentSection: WorkspaceSection = "idea",
 ) {
   const hasMeaningfulChange = idea !== draft.idea;
-
   return hydrateWorkspaceDraft({
     ...draft,
     idea,
@@ -249,12 +318,17 @@ export function toggleWorkspaceSkill(
   skill: SelectedSkill,
   currentSection: WorkspaceSection = "skills",
 ) {
-  const exists = draft.selectedSkills.some((item) => item.id === skill.id);
+  const targetIdentity = getSkillIdentity(skill);
+  const exists = draft.selectedSkills.some(
+    (item) => getSkillIdentity(item) === targetIdentity,
+  );
 
   return hydrateWorkspaceDraft({
     ...draft,
     selectedSkills: exists
-      ? draft.selectedSkills.filter((item) => item.id !== skill.id)
+      ? draft.selectedSkills.filter(
+          (item) => getSkillIdentity(item) !== targetIdentity,
+        )
       : [...draft.selectedSkills, skill],
     lastVisitedSection: currentSection,
     updatedAt: new Date().toISOString(),
@@ -294,7 +368,6 @@ export function loadWorkspaceDraft() {
   }
 
   const rawValue = window.localStorage.getItem(WORKSPACE_DRAFT_KEY);
-
   if (!rawValue) {
     return createEmptyWorkspaceDraft();
   }
@@ -324,14 +397,18 @@ export function clearWorkspaceDraft() {
   if (!canUseDraftStorage()) {
     return;
   }
-
   window.localStorage.removeItem(WORKSPACE_DRAFT_KEY);
 }
 
 export function getDraftCompletionState(
   draft: WorkspaceDraft,
 ): DraftCompletionState {
+  const planningDone =
+    hasPlanningBriefInput(draft.planningBrief) &&
+    draft.superpowersStatus !== "not_installed";
+
   return {
+    planning: planningDone,
     idea: Boolean(draft.idea.trim() && draft.analysis && draft.selectedTypeId),
     architecture: Boolean(draft.architecture),
     skills: Boolean(draft.architecture),
@@ -341,13 +418,12 @@ export function getDraftCompletionState(
 
 export function buildSavedProjectFromDraft(draft: WorkspaceDraft) {
   const selectedServiceType = getSelectedServiceType(draft);
-
   if (!draft.analysis || !selectedServiceType || !draft.architecture) {
     return null;
   }
 
   return buildMockProject({
-    title: draft.projectName.trim() || `${selectedServiceType.name} 프로젝트`,
+    title: draft.projectName.trim() || `${selectedServiceType.name} Project`,
     idea: draft.idea,
     sourceIdeaId: draft.sourceIdeaId,
     sourceIdeaTitle: draft.sourceIdeaTitle,
@@ -358,6 +434,8 @@ export function buildSavedProjectFromDraft(draft: WorkspaceDraft) {
     promptStages: draft.promptStages,
     keyNeeds: draft.analysis.keyNeeds,
     nextQuestions: draft.analysis.nextQuestions,
+    planningBrief: draft.planningBrief,
+    superpowersStatus: draft.superpowersStatus,
   });
 }
 
@@ -365,9 +443,9 @@ export function createWorkspaceSummary(draft: WorkspaceDraft) {
   const selectedServiceType = getSelectedServiceType(draft);
 
   return {
-    title: draft.projectName.trim() || draft.sourceIdeaTitle || "이름 미정",
+    title: draft.projectName.trim() || draft.sourceIdeaTitle || "Untitled",
     idea: draft.idea.trim(),
-    serviceType: selectedServiceType?.name ?? "유형 미선택",
+    serviceType: selectedServiceType?.name ?? "Not selected",
     updatedAt: draft.updatedAt,
   };
 }
@@ -378,7 +456,6 @@ export function getRecommendedServiceKeywords(
   if (!serviceType) {
     return [];
   }
-
   return [serviceType.name, ...serviceType.tags].filter(Boolean);
 }
 

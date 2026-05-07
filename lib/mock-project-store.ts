@@ -2,10 +2,12 @@ import { generateArchitectureBlueprint } from "@/lib/architecture-generator";
 import { generatePromptStages } from "@/lib/prompt-generator";
 import type {
   ArchitectureOptions,
+  PlanningBrief,
   ProjectChecklistItem,
   ProjectStatus,
   SavedProject,
   ServiceTypeId,
+  SuperpowersStatus,
 } from "@/types/project";
 
 const STORAGE_KEY = "vibe-coding-helper.mock-projects";
@@ -128,6 +130,8 @@ export function buildMockProject(input: {
   promptStages: SavedProject["promptStages"];
   keyNeeds: string[];
   nextQuestions: string[];
+  planningBrief?: PlanningBrief | null;
+  superpowersStatus?: SuperpowersStatus;
 }): SavedProject {
   return {
     id:
@@ -149,6 +153,8 @@ export function buildMockProject(input: {
     status: "draft",
     updatedAt: new Date().toISOString(),
     source: "mock",
+    planningBrief: input.planningBrief ?? null,
+    superpowersStatus: input.superpowersStatus ?? "not_installed",
   };
 }
 

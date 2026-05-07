@@ -10,6 +10,8 @@ import {
   Menu,
   PanelLeftClose,
   ScrollText,
+  Sparkles,
+  Wrench,
   X,
 } from "lucide-react";
 
@@ -34,6 +36,13 @@ type SubNavItem = {
 
 const buildItems: NavItem[] = [
   {
+    href: "/helper/planning",
+    label: "Superpowers",
+    section: "planning",
+    icon: Sparkles,
+    isWorkspaceStep: true,
+  },
+  {
     href: "/helper/idea",
     label: "아이디어",
     section: "idea",
@@ -42,9 +51,16 @@ const buildItems: NavItem[] = [
   },
   {
     href: "/helper/architecture",
-    label: "구조",
+    label: "아키텍처",
     section: "architecture",
     icon: PanelLeftClose,
+    isWorkspaceStep: true,
+  },
+  {
+    href: "/helper/skills",
+    label: "도구 추천",
+    section: "skills",
+    icon: Wrench,
     isWorkspaceStep: true,
   },
   {
@@ -57,8 +73,8 @@ const buildItems: NavItem[] = [
 ];
 
 const exploreSubNav: SubNavItem[] = [
-  { href: "/helper/explore/skills", label: "스킬" },
-  { href: "/helper/explore/plugins", label: "플러그인" },
+  { href: "/helper/explore/skills", label: "스킬 탐색" },
+  { href: "/helper/explore/plugins", label: "플러그인 탐색" },
 ];
 
 const projectSubNav: SubNavItem[] = [
@@ -73,7 +89,7 @@ const navGroups: Array<{
 }> = [
   {
     id: "build",
-    label: "빌드",
+    label: "빌드 흐름",
     items: buildItems,
   },
   {
@@ -104,7 +120,6 @@ function isActivePath(pathname: string, href: string) {
   if (href === pathname) {
     return true;
   }
-
   return href !== "/" && pathname.startsWith(`${href}/`);
 }
 
@@ -114,12 +129,16 @@ function getSectionTitle(pathname: string, section: WorkspaceSection) {
   }
 
   switch (section) {
+    case "planning":
+      return "0. Superpowers 구체화";
     case "idea":
-      return "아이디어 정리";
+      return "1. 아이디어 정리";
     case "architecture":
-      return "구조 초안";
+      return "2. 기술 구조";
+    case "skills":
+      return "3. 도구 추천";
     case "prompts":
-      return "프롬프트 묶음";
+      return "4. 실행 프롬프트";
     case "explore":
       return "탐색";
     case "projects":
@@ -134,7 +153,6 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const activeItem = navItems.find((item) => isActivePath(pathname, item.href));
-
     if (activeItem) {
       visitSection(activeItem.section);
     }
@@ -148,19 +166,21 @@ export function AppShell({ children }: { children: ReactNode }) {
     ) ?? navGroups[0];
 
   const completionMap = {
+    planning: completion.planning,
     idea: completion.idea,
     architecture: completion.architecture,
+    skills: completion.skills,
     prompts: completion.prompts,
   };
   const completedSteps = Object.values(completionMap).filter(Boolean).length;
-  const progressWidth = `${(completedSteps / 3) * 100}%`;
+  const progressWidth = `${(completedSteps / 5) * 100}%`;
 
   const headerSubNav =
     currentGroup.id === "build"
       ? buildItems.map((item, index) => ({
           href: item.href,
           label: item.label,
-          number: index + 1,
+          number: index,
           complete: completionMap[item.section as keyof typeof completionMap],
         }))
       : currentItem.section === "explore"
@@ -170,10 +190,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen">
       <div className="section-shell py-3 sm:py-4 md:py-6">
-        <div className="grid gap-3 sm:gap-4 xl:grid-cols-[280px_minmax(0,1fr)]">
+        <div className="grid gap-3 sm:gap-4 xl:grid-cols-[300px_minmax(0,1fr)]">
           <aside
             className={cn(
-              "glass-panel shadow-soft fixed inset-y-3 left-2 z-50 w-[min(280px,calc(100vw-1rem))] rounded-[1.8rem] border border-[#b8b8d1]/35 p-3.5 transition sm:inset-y-4 sm:left-4 sm:w-[min(280px,calc(100vw-2rem))] sm:p-4 xl:static xl:w-auto xl:rounded-[2rem]",
+              "glass-panel shadow-soft fixed inset-y-3 left-2 z-50 w-[min(300px,calc(100vw-1rem))] rounded-[1.8rem] border border-[#b8b8d1]/35 p-3.5 transition sm:inset-y-4 sm:left-4 sm:w-[min(300px,calc(100vw-2rem))] sm:p-4 xl:static xl:w-auto xl:rounded-[2rem]",
               isMenuOpen ? "translate-x-0" : "-translate-x-[110%] xl:translate-x-0",
             )}
           >
@@ -182,7 +202,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <p className="text-xs uppercase tracking-[0.26em] text-primary">
                   Good Vibe
                 </p>
-                <p className="text-lg font-semibold text-foreground">Helper 워크스페이스</p>
+                <p className="text-lg font-semibold text-foreground">
+                  헬퍼 워크스페이스
+                </p>
               </Link>
 
               <Button
@@ -198,7 +220,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="rounded-[1.6rem] panel-accent px-4 py-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs uppercase tracking-[0.24em] text-primary">
-                  현재 초안
+                  현재 드래프트
                 </p>
                 <span className="rounded-full border border-primary/15 bg-primary px-2.5 py-1 text-[11px] text-primary-foreground">
                   자동 저장
@@ -210,14 +232,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                   {summary.serviceType}
                 </span>
                 <span className="rounded-full border border-[#b8b8d1]/45 bg-[#fffffb]/72 px-3 py-1 text-xs text-muted-foreground">
-                  {draft.options.design === "standard" ? "기본 UI" : "브랜드 UI"}
+                  {draft.options.design === "standard" ? "기본 UI" : "커스텀 UI"}
                 </span>
               </div>
 
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>진행도</span>
-                  <span>{completedSteps}/3</span>
+                  <span>{completedSteps}/5</span>
                 </div>
                 <div className="h-2 rounded-full bg-[#b8b8d1]/30">
                   <div
@@ -322,7 +344,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <div className="flex min-w-max items-center gap-2 px-1">
                     {headerSubNav.map((item) => {
                       const isActive = isActivePath(pathname, item.href);
-
                       return (
                         <Link
                           key={item.href}
@@ -334,7 +355,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                               : "border-[#b8b8d1]/45 bg-[#fffffb]/72 text-muted-foreground hover:border-accent/35 hover:text-foreground",
                           )}
                         >
-                          {item.number ? (
+                          {item.number !== null ? (
                             <span
                               className={cn(
                                 "inline-flex size-5 items-center justify-center rounded-full text-[11px] font-semibold sm:size-6 sm:text-xs",

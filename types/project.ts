@@ -6,12 +6,27 @@ export type ServiceTypeId =
   | "content-generator"
   | "app";
 
-export type ProjectComplexity = "가벼움" | "중간" | "높음";
+export type ProjectComplexity = "low" | "medium" | "high";
 export type BudgetPreference = "free" | "flexible";
 export type DesignPreference = "standard" | "custom";
 export type BuildEnvironment = "local" | "cloud";
-export type AnalysisConfidence = "보통" | "높음";
+export type AnalysisConfidence = "normal" | "high";
 export type ProjectStatus = "draft" | "ready" | "mock-live";
+export type SuperpowersStatus =
+  | "not_installed"
+  | "plugin_installed"
+  | "manual_installed"
+  | "skipped";
+
+export interface PlanningBrief {
+  problem: string;
+  targetUser: string;
+  userJourney: string;
+  mvpScope: string;
+  outOfScope: string;
+  successCriteria: string;
+  constraints: string;
+}
 
 export interface ArchitectureOptions {
   budget: BudgetPreference;
@@ -37,6 +52,7 @@ export interface IdeaAnalysisInput {
   idea: string;
   projectName?: string;
   prioritizeFreeTools?: boolean;
+  planningBrief?: PlanningBrief | null;
 }
 
 export interface IdeaAnalysisResult {
@@ -56,6 +72,8 @@ export interface PromptGeneratorInput {
   design: DesignPreference;
   environment: BuildEnvironment;
   selectedSkills?: SelectedSkill[];
+  planningBrief?: PlanningBrief | null;
+  superpowersStatus?: SuperpowersStatus;
 }
 
 export interface PromptStage {
@@ -110,6 +128,8 @@ export interface SavedProject {
   status: ProjectStatus;
   updatedAt: string;
   source: "mock" | "supabase";
+  planningBrief?: PlanningBrief | null;
+  superpowersStatus?: SuperpowersStatus;
 }
 
 export interface ProjectRecord {
@@ -120,6 +140,7 @@ export interface ProjectRecord {
 }
 
 export type WorkspaceSection =
+  | "planning"
   | "idea"
   | "architecture"
   | "skills"
@@ -128,6 +149,7 @@ export type WorkspaceSection =
   | "projects";
 
 export interface DraftCompletionState {
+  planning: boolean;
   idea: boolean;
   architecture: boolean;
   skills: boolean;
@@ -137,6 +159,8 @@ export interface DraftCompletionState {
 export interface WorkspaceDraft {
   projectName: string;
   idea: string;
+  planningBrief: PlanningBrief;
+  superpowersStatus: SuperpowersStatus;
   sourceIdeaId: string | null;
   sourceIdeaTitle: string | null;
   analysis: IdeaAnalysisResult | null;

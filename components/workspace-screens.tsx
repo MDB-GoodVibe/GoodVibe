@@ -2,19 +2,14 @@
 
 import Link from "next/link";
 import { useDeferredValue, useEffect, useRef, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
   Check,
-  ChevronRight,
-  Cloud,
-  Code2,
-  Database,
   ExternalLink,
-  LayoutTemplate,
   LoaderCircle,
-  PanelTop,
-  Rocket,
   Search,
+  Sparkles,
   Wand2,
 } from "lucide-react";
 
@@ -38,25 +33,26 @@ import type {
 } from "@/types/project";
 
 const budgetOptions = [
-  { value: "free" as const, label: "무료 중심", hint: "가볍게 시작하고 검증하기 좋은 구성" },
-  { value: "flexible" as const, label: "유료 포함", hint: "좋은 도구를 같이 써도 괜찮은 구성" },
+  { value: "free" as const, label: "무료 우선", hint: "최소 비용으로 빠르게 검증합니다." },
+  { value: "flexible" as const, label: "유연한 예산", hint: "필요 시 유료 도구를 사용합니다." },
 ] as const;
 
 const designOptions = [
-  { value: "standard" as const, label: "기본 UI", hint: "빠른 구현과 검증에 맞는 화면" },
-  { value: "custom" as const, label: "브랜드형 UI", hint: "톤과 인상이 더 중요한 화면" },
+  { value: "standard" as const, label: "기본 UI", hint: "빠르게 구현하고 단순하게 전달합니다." },
+  { value: "custom" as const, label: "브랜드 중심 UI", hint: "시각 아이덴티티에 더 투자합니다." },
 ] as const;
 
 const environmentOptions = [
-  { value: "local" as const, label: "로컬 작업", hint: "Cursor, Claude Code, Codex 같은 흐름" },
-  { value: "cloud" as const, label: "클라우드 작업", hint: "브라우저 중심으로 빠르게 진행" },
+  { value: "local" as const, label: "로컬", hint: "내 PC에서 Codex/Cursor/CLI 흐름으로 작업합니다." },
+  { value: "cloud" as const, label: "클라우드", hint: "브라우저 중심 협업 흐름으로 작업합니다." },
 ] as const;
 
 const stageItems = [
-  { id: "idea" as const, title: "아이디어", summary: "무엇을 만들지 정하기", href: "/helper/idea" },
-  { id: "architecture" as const, title: "구조", summary: "기술 구성을 고르기", href: "/helper/architecture" },
-  { id: "skills" as const, title: "스킬", summary: "설치할 보조 도구 고르기", href: "/helper/skills" },
-  { id: "prompts" as const, title: "프롬프트", summary: "복사해서 바로 실행하기", href: "/helper/prompts" },
+  { id: "planning" as const, title: "0. Superpowers", summary: "아이디어를 기획 입력값으로 정리", href: "/helper/planning" },
+  { id: "idea" as const, title: "1. 아이디어", summary: "구체 아이디어 분석", href: "/helper/idea" },
+  { id: "architecture" as const, title: "2. 아키텍처", summary: "스택과 구조 선택", href: "/helper/architecture" },
+  { id: "skills" as const, title: "3. 도구 추천", summary: "스킬/플러그인 선택", href: "/helper/skills" },
+  { id: "prompts" as const, title: "4. 실행 프롬프트", summary: "단계별 프롬프트 실행", href: "/helper/prompts" },
 ] as const;
 
 const skillSources = [
@@ -71,6 +67,34 @@ const skillSorts: Array<{ id: CatalogSort; label: string }> = [
   { id: "hot", label: "HOT" },
 ];
 
+const fixedRecommendedSkills = [
+  {
+    name: "obra/superpowers",
+    reason: "코딩 전 brainstorming -> writing-plans 순서로 구체화합니다.",
+    how: "Codex 플러그인 사이드바에서 설치(권장).",
+  },
+  {
+    name: "playwright",
+    reason: "UI 동작 검증이 필요한 프로젝트에 적합합니다.",
+    how: "브라우저 실제 동작 확인이 중요할 때 사용합니다.",
+  },
+  {
+    name: "openai-docs",
+    reason: "OpenAI API 기반 서비스에 적합합니다.",
+    how: "최신 모델/문서 기준 가이드가 필요할 때 사용합니다.",
+  },
+  {
+    name: "vercel-deploy",
+    reason: "배포 중심 프로젝트에 적합합니다.",
+    how: "4단계에서 빠르게 배포할 때 사용합니다.",
+  },
+  {
+    name: "security-best-practices",
+    reason: "인증/DB/API 포함 프로젝트에 적합합니다.",
+    how: "계정, 세션, 사용자 데이터가 있을 때 사용합니다.",
+  },
+];
+
 function HelperShell({ children }: { children: ReactNode }) {
   return <div className="space-y-5">{children}</div>;
 }
@@ -78,10 +102,12 @@ function HelperShell({ children }: { children: ReactNode }) {
 function HelperHeader({
   title,
   description,
+  fixedGuide,
   action,
 }: {
   title: string;
   description: string;
+  fixedGuide: string;
   action?: ReactNode;
 }) {
   return (
@@ -95,6 +121,9 @@ function HelperHeader({
             {title}
           </h1>
           <p className="text-[13px] text-muted-foreground">{description}</p>
+          <p className="rounded-xl bg-[rgba(59,53,97,0.06)] px-3 py-2 text-[12px] text-primary">
+            {fixedGuide}
+          </p>
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}
       </div>
@@ -105,13 +134,12 @@ function HelperHeader({
 function HorizontalStageNav({
   current,
 }: {
-  current: Extract<WorkspaceSection, "idea" | "architecture" | "skills" | "prompts">;
+  current: Extract<WorkspaceSection, "planning" | "idea" | "architecture" | "skills" | "prompts">;
 }) {
   return (
-    <section className="grid gap-3 xl:grid-cols-4">
+    <section className="grid gap-3 xl:grid-cols-5">
       {stageItems.map((item, index) => {
         const active = item.id === current;
-
         return (
           <Link
             key={item.id}
@@ -133,18 +161,13 @@ function HorizontalStageNav({
                       : "bg-[rgba(59,53,97,0.06)] text-primary",
                   )}
                 >
-                  {index + 1}
+                  {index}
                 </span>
                 <div className="min-w-0">
                   <p className="text-[14px] font-semibold text-primary">{item.title}</p>
                   <p className="text-[12px] text-muted-foreground">{item.summary}</p>
                 </div>
               </div>
-              {active ? (
-                <span className="shrink-0 rounded-full bg-[rgba(255,107,108,0.10)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-secondary">
-                  현재 단계
-                </span>
-              ) : null}
             </div>
           </Link>
         );
@@ -180,25 +203,292 @@ function SectionCard({
   );
 }
 
-function StatGrid({
-  items,
-}: {
-  items: Array<{ label: string; value: string }>;
-}) {
+function buildSelectedSkill(item: ExternalCatalogItem): SelectedSkill {
+  return {
+    id: item.id,
+    title: item.title,
+    sourceLabel: item.sourceLabel,
+    summary: item.summary,
+    url: item.url,
+    repoUrl: item.repoUrl,
+    installCommand: item.installCommand,
+    tags: item.tags,
+    popularityLabel: item.popularityLabel,
+  };
+}
+
+function normalizeToken(value: string) {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function getExternalSkillIdentity(item: ExternalCatalogItem) {
+  const normalizedSlug = normalizeToken(item.slug);
+  if (normalizedSlug) {
+    return normalizedSlug.split("/").pop() ?? normalizedSlug;
+  }
+  return normalizeToken(item.title);
+}
+
+function getSelectedSkillIdentity(skill: SelectedSkill) {
+  const normalizedId = normalizeToken(skill.id);
+  const trailingId = normalizedId.split(":").pop() ?? normalizedId;
+  const idSlug = trailingId.split("/").pop() ?? trailingId;
+  return idSlug || normalizeToken(skill.title);
+}
+
+function isSkillSelected(
+  selectedSkills: SelectedSkill[],
+  item: ExternalCatalogItem,
+) {
+  const targetIdentity = getExternalSkillIdentity(item);
+  return selectedSkills.some(
+    (selectedSkill) => getSelectedSkillIdentity(selectedSkill) === targetIdentity,
+  );
+}
+
+export function PlanningWorkspaceScreen() {
+  const { draft, setPlanningBrief, setSuperpowersStatus, completion, visitSection } = useWorkspace();
+
+  useEffect(() => {
+    visitSection("planning");
+  }, [visitSection]);
+
+  const brainstormingPrompt = `superpowers의 brainstorming으로 아래 아이디어를 구체화해줘:\n- 문제 정의: ${draft.planningBrief.problem || "[작성]"}\n- 대상 사용자: ${draft.planningBrief.targetUser || "[작성]"}\n- 사용자 여정: ${draft.planningBrief.userJourney || "[작성]"}\n- MVP 범위: ${draft.planningBrief.mvpScope || "[작성]"}\n- 제외 범위: ${draft.planningBrief.outOfScope || "[작성]"}\n- 성공 기준: ${draft.planningBrief.successCriteria || "[작성]"}\n- 기술 제약: ${draft.planningBrief.constraints || "[작성]"}`;
+
+  const writingPlansPrompt = `이제 superpowers의 writing-plans를 사용해줘.\n위에서 정리한 기획을 기준으로 마일스톤, 수용 기준, 리스크 점검이 포함된 구현 계획으로 만들어줘.`;
+
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      {items.map((item) => (
-        <div
-          key={item.label}
-          className="rounded-[1.2rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)] px-4 py-4"
+    <HelperShell>
+      <HelperHeader
+        title="Superpowers 기획"
+        description="코딩 전에 superpowers 방식으로 아이디어를 구조화하세요."
+        fixedGuide="이 단계의 결과는 아이디어 분석과 프롬프트 생성의 핵심 입력값으로 사용됩니다."
+      />
+      <HorizontalStageNav current="planning" />
+
+      <section className="grid gap-4 xl:grid-cols-[1fr_1fr]">
+        <SectionCard
+          title="Superpowers란?"
+          description="brainstorming으로 가정을 다듬고 writing-plans로 실행 계획으로 전환합니다."
         >
-          <p className="text-[11px] text-muted-foreground">{item.label}</p>
-          <p className="mt-1.5 text-[1.05rem] font-semibold tracking-[-0.03em] text-primary">
-            {item.value}
-          </p>
+          <div className="space-y-2 text-[13px] text-muted-foreground">
+            <p>1. `brainstorming`: 빠진 질문을 찾아 범위를 선명하게 만듭니다.</p>
+            <p>2. `writing-plans`: 합의된 범위를 구현 가능한 작업으로 쪼갭니다.</p>
+            <p>3. `using-superpowers`: 상황에 맞는 스킬 사용 흐름을 안내합니다.</p>
+          </div>
+        </SectionCard>
+
+        <SectionCard title="설치 가이드" description="권장 경로를 우선, 수동 설치는 보조로 안내합니다.">
+          <div className="space-y-3 text-[13px]">
+            <div className="rounded-xl bg-[rgba(248,247,248,0.92)] p-3">
+              <p className="font-semibold text-primary">권장: Codex 플러그인 사이드바</p>
+              <p className="text-muted-foreground">플러그인 사이드바에서 `Superpowers`를 설치하세요.</p>
+            </div>
+            <div className="rounded-xl border border-dashed border-[rgba(121,118,127,0.2)] p-3">
+              <p className="font-semibold text-primary">고급 수동 설치 (Windows)</p>
+              <p className="font-mono text-[12px] text-muted-foreground">git clone https://github.com/obra/superpowers.git ~/.codex/superpowers</p>
+              <p className="font-mono text-[12px] text-muted-foreground">mklink /J ~/.agents/skills/superpowers ~/.codex/superpowers</p>
+              <p className="text-muted-foreground">수동 설치 후 Codex를 재시작하세요.</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                ["not_installed", "미설치"],
+                ["plugin_installed", "플러그인 설치 완료"],
+                ["manual_installed", "수동 설치 완료"],
+                ["skipped", "이번엔 건너뛰기"],
+              ].map(([value, label]) => (
+                <Button
+                  key={value}
+                  type="button"
+                  size="sm"
+                  variant={draft.superpowersStatus === value ? "default" : "outline"}
+                  onClick={() =>
+                    setSuperpowersStatus(value as typeof draft.superpowersStatus, "planning")
+                  }
+                >
+                  {label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </SectionCard>
+      </section>
+
+      <SectionCard title="기획 입력 템플릿" description="아래 항목을 채우면 다음 단계 가이드 정확도가 올라갑니다.">
+        <div className="grid gap-3 md:grid-cols-2">
+          <Input value={draft.planningBrief.problem} placeholder="문제 정의" onChange={(e) => setPlanningBrief({ problem: e.target.value }, "planning")} />
+          <Input value={draft.planningBrief.targetUser} placeholder="대상 사용자" onChange={(e) => setPlanningBrief({ targetUser: e.target.value }, "planning")} />
+          <Textarea className="min-h-24" value={draft.planningBrief.userJourney} placeholder="핵심 사용자 여정" onChange={(e) => setPlanningBrief({ userJourney: e.target.value }, "planning")} />
+          <Textarea className="min-h-24" value={draft.planningBrief.mvpScope} placeholder="MVP 범위" onChange={(e) => setPlanningBrief({ mvpScope: e.target.value }, "planning")} />
+          <Textarea className="min-h-24" value={draft.planningBrief.outOfScope} placeholder="제외 범위" onChange={(e) => setPlanningBrief({ outOfScope: e.target.value }, "planning")} />
+          <Textarea className="min-h-24" value={draft.planningBrief.successCriteria} placeholder="성공 기준" onChange={(e) => setPlanningBrief({ successCriteria: e.target.value }, "planning")} />
+          <Textarea className="min-h-24 md:col-span-2" value={draft.planningBrief.constraints} placeholder="기술 제약" onChange={(e) => setPlanningBrief({ constraints: e.target.value }, "planning")} />
         </div>
-      ))}
-    </div>
+      </SectionCard>
+
+      <section className="grid gap-4 xl:grid-cols-[1fr_1fr]">
+        <SectionCard title="프롬프트: brainstorming" description="기획 정제 시 Codex에 붙여 넣어 사용하세요.">
+          <pre className="overflow-x-auto rounded-xl bg-[rgba(248,247,248,0.92)] p-3 text-[12px] whitespace-pre-wrap">{brainstormingPrompt}</pre>
+        </SectionCard>
+        <SectionCard title="프롬프트: writing-plans" description="기획 합의 후 실행 계획을 만들 때 사용하세요.">
+          <pre className="overflow-x-auto rounded-xl bg-[rgba(248,247,248,0.92)] p-3 text-[12px] whitespace-pre-wrap">{writingPlansPrompt}</pre>
+          {completion.planning ? (
+            <p className="mt-3 text-[12px] text-primary">기획 단계 완료: 아이디어 단계에 사용할 구조화 입력값이 준비되었습니다.</p>
+          ) : null}
+        </SectionCard>
+      </section>
+
+      <div className="flex justify-end">
+        <Button asChild size="sm">
+          <Link href="/helper/idea">아이디어 단계로 이동</Link>
+        </Button>
+      </div>
+    </HelperShell>
+  );
+}
+
+export function IdeaWorkspaceScreen({
+  importedIdea,
+  autoAnalyze = false,
+}: {
+  importedIdea?: {
+    sourceIdeaId: string;
+    sourceIdeaTitle: string;
+    idea: string;
+  } | null;
+  autoAnalyze?: boolean;
+}) {
+  const router = useRouter();
+  const {
+    analyzeIdea,
+    draft,
+    importIdeaSource,
+    selectServiceType,
+    selectedServiceType,
+    setIdea,
+    setProjectName,
+    visitSection,
+    completion,
+  } = useWorkspace();
+  const autoAnalyzedSourceIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    visitSection("idea");
+  }, [visitSection]);
+
+  useEffect(() => {
+    if (!importedIdea) return;
+    if (
+      draft.sourceIdeaId === importedIdea.sourceIdeaId &&
+      draft.idea.trim() === importedIdea.idea.trim()
+    ) {
+      return;
+    }
+    importIdeaSource(importedIdea);
+    router.replace("/helper/idea");
+  }, [draft.idea, draft.sourceIdeaId, importIdeaSource, importedIdea, router]);
+
+  useEffect(() => {
+    if (!autoAnalyze || !importedIdea) return;
+    const ready =
+      draft.sourceIdeaId === importedIdea.sourceIdeaId &&
+      draft.idea.trim() === importedIdea.idea.trim();
+    if (!ready || draft.analysis) return;
+    if (autoAnalyzedSourceIdRef.current === importedIdea.sourceIdeaId) return;
+    autoAnalyzedSourceIdRef.current = importedIdea.sourceIdeaId;
+    analyzeIdea("idea");
+  }, [analyzeIdea, autoAnalyze, draft.analysis, draft.idea, draft.sourceIdeaId, importedIdea]);
+
+  return (
+    <HelperShell>
+      <HelperHeader
+        title="Idea Definition"
+        description="아이디어를 구체적으로 입력하고 분석을 실행하세요."
+        fixedGuide="여기서 선택한 서비스 유형이 아키텍처와 프롬프트에 반영됩니다."
+        action={
+          <Button asChild size="sm" variant="outline">
+            <Link href="/ideas">아이디어보드에서 가져오기</Link>
+          </Button>
+        }
+      />
+      <HorizontalStageNav current="idea" />
+      {!completion.planning ? (
+        <SectionCard title="사전 권장 단계" description="Superpowers 0단계를 먼저 완료하면 품질이 올라갑니다.">
+          <p className="text-[13px] text-muted-foreground">지금 진행할 수는 있지만 0단계를 완료한 뒤가 더 정확합니다.</p>
+          <Button asChild className="mt-3" size="sm" variant="outline">
+            <Link href="/helper/planning">Superpowers 단계로 이동</Link>
+          </Button>
+        </SectionCard>
+      ) : null}
+
+      <SectionCard title="입력" description="문제, 사용자, 기대 결과를 구체적으로 작성하세요.">
+        <div className="space-y-4">
+          <Input value={draft.projectName} onChange={(e) => setProjectName(e.target.value, "idea")} placeholder="프로젝트 이름" />
+          <Textarea className="min-h-40" value={draft.idea} onChange={(e) => setIdea(e.target.value, "idea")} placeholder="만들고 싶은 서비스 아이디어를 구체적으로 적어주세요." />
+          <div className="flex flex-wrap justify-end gap-2">
+            {draft.analysis ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/helper/architecture">아키텍처 단계로 이동</Link>
+              </Button>
+            ) : null}
+            <Button onClick={() => analyzeIdea("idea")} disabled={!draft.idea.trim()} size="sm">
+              <Wand2 className="size-4" />
+              {draft.analysis ? "다시 분석" : "아이디어 분석"}
+            </Button>
+          </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="서비스 유형 선택" description="가장 맞는 서비스 형태를 하나 선택하세요.">
+        <div className="grid gap-3">
+          {(draft.analysis?.serviceTypes ?? []).map((serviceType) => {
+            const active = draft.selectedTypeId === serviceType.id;
+            return (
+              <button
+                key={serviceType.id}
+                type="button"
+                onClick={() => selectServiceType(serviceType.id, "idea")}
+                className={cn(
+                  "rounded-[1.2rem] border px-4 py-4 text-left transition",
+                  active
+                    ? "border-primary/14 bg-primary text-white"
+                    : "border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)] hover:bg-white",
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-semibold">{serviceType.name}</p>
+                    <p className={cn("mt-1 text-[12px] leading-5", active ? "text-white/78" : "text-muted-foreground")}>
+                      {serviceType.summary}
+                    </p>
+                    <p className={cn("mt-1 text-[12px] leading-5", active ? "text-white/70" : "text-muted-foreground")}>
+                      {serviceType.fitReason}
+                    </p>
+                  </div>
+                  {active ? <BadgeCheck className="mt-0.5 size-4 shrink-0" /> : null}
+                </div>
+              </button>
+            );
+          })}
+          {!draft.analysis ? (
+            <p className="rounded-[1.2rem] border border-dashed border-[rgba(121,118,127,0.16)] px-4 py-4 text-[12px] text-muted-foreground">
+              추천 유형을 보려면 먼저 아이디어 분석을 실행하세요.
+            </p>
+          ) : null}
+        </div>
+      </SectionCard>
+
+      {selectedServiceType ? (
+        <SectionCard title="선택 요약">
+          <div className="flex flex-wrap gap-2 text-[12px]">
+            <span className="rounded-full bg-[rgba(248,247,248,0.92)] px-3 py-1">{selectedServiceType.name}</span>
+            {selectedServiceType.tags.map((tag) => (
+              <span key={tag} className="rounded-full bg-[rgba(248,247,248,0.92)] px-3 py-1">{tag}</span>
+            ))}
+          </div>
+        </SectionCard>
+      ) : null}
+    </HelperShell>
   );
 }
 
@@ -218,7 +508,6 @@ function OptionCard({
       <div className="space-y-2">
         {options.map((option) => {
           const active = option.value === value;
-
           return (
             <button
               key={option.value}
@@ -243,362 +532,6 @@ function OptionCard({
   );
 }
 
-function buildSelectedSkill(item: ExternalCatalogItem): SelectedSkill {
-  return {
-    id: item.id,
-    title: item.title,
-    sourceLabel: item.sourceLabel,
-    summary: item.summary,
-    url: item.url,
-    repoUrl: item.repoUrl,
-    installCommand: item.installCommand,
-    tags: item.tags,
-    popularityLabel: item.popularityLabel,
-  };
-}
-
-function StageSelector({
-  stages,
-  activeStage,
-  onSelect,
-}: {
-  stages: Array<{
-    stage: 1 | 2 | 3 | 4;
-    title: string;
-    objective: string;
-    checklist: string[];
-  }>;
-  activeStage: 1 | 2 | 3 | 4;
-  onSelect: (stage: 1 | 2 | 3 | 4) => void;
-}) {
-  return (
-    <section className="grid gap-3 xl:grid-cols-4">
-      {stages.map((stage) => {
-        const active = stage.stage === activeStage;
-
-        return (
-          <button
-            key={stage.stage}
-            type="button"
-            onClick={() => onSelect(stage.stage)}
-            className={cn(
-              "rounded-[1.4rem] border px-4 py-4 text-left transition",
-              active
-                ? "border-primary/14 bg-primary text-white shadow-[0_16px_30px_rgba(59,53,97,0.16)]"
-                : "border-[rgba(121,118,127,0.08)] bg-white hover:bg-[rgba(248,247,248,0.92)]",
-            )}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p
-                  className={cn(
-                    "text-[10px] font-extrabold uppercase tracking-[0.22em]",
-                    active ? "text-white/72" : "text-primary/56",
-                  )}
-                >
-                  Stage {stage.stage}
-                </p>
-                <p className="mt-2 text-[14px] font-semibold">{stage.title}</p>
-                <p
-                  className={cn(
-                    "mt-1 text-[12px] leading-5",
-                    active ? "text-white/76" : "text-muted-foreground",
-                  )}
-                >
-                  {stage.objective}
-                </p>
-              </div>
-              {active ? (
-                <span className="shrink-0 rounded-full bg-white/12 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-white/80">
-                  실행 중
-                </span>
-              ) : null}
-            </div>
-          </button>
-        );
-      })}
-    </section>
-  );
-}
-
-function TechnologyCards({
-  options,
-}: {
-  options: ArchitectureOptions;
-}) {
-  const items = [
-    {
-      title: "Next.js + TypeScript",
-      description: "App Router 기반으로 화면과 서버 동작을 함께 관리합니다.",
-      icon: PanelTop,
-    },
-    {
-      title: "Tailwind + shadcn/ui",
-      description: options.design === "custom" ? "브랜드 톤을 더한 커스텀 UI에 맞습니다." : "빠른 구현과 검증에 맞는 UI 조합입니다.",
-      icon: LayoutTemplate,
-    },
-    {
-      title: "Supabase",
-      description: "인증, 데이터 저장, 기본 백엔드 역할을 한 번에 맡깁니다.",
-      icon: Database,
-    },
-    {
-      title: options.environment === "local" ? "로컬 IDE" : "클라우드 IDE",
-      description: options.environment === "local" ? "Cursor, Claude Code, Codex 같은 흐름과 잘 맞습니다." : "브라우저 중심 작업과 빠른 공유에 유리합니다.",
-      icon: options.environment === "local" ? Code2 : Cloud,
-    },
-    {
-      title: "Vercel",
-      description: "프론트엔드 배포와 미리보기를 가장 빠르게 연결할 수 있습니다.",
-      icon: Rocket,
-    },
-  ];
-
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {items.map((item) => {
-        const Icon = item.icon;
-
-        return (
-          <div
-            key={item.title}
-            className="rounded-[1.2rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)] px-4 py-4"
-          >
-            <div className="flex size-9 items-center justify-center rounded-full bg-white text-primary">
-              <Icon className="size-4" />
-            </div>
-            <p className="mt-3 text-[13px] font-semibold text-primary">{item.title}</p>
-            <p className="mt-1 text-[12px] leading-5 text-muted-foreground">{item.description}</p>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-export function IdeaWorkspaceScreen({
-  importedIdea,
-  autoAnalyze = false,
-}: {
-  importedIdea?: {
-    sourceIdeaId: string;
-    sourceIdeaTitle: string;
-    idea: string;
-  } | null;
-  autoAnalyze?: boolean;
-}) {
-  const {
-    analyzeIdea,
-    draft,
-    importIdeaSource,
-    selectServiceType,
-    selectedServiceType,
-    setIdea,
-    setProjectName,
-    visitSection,
-  } = useWorkspace();
-  const autoAnalyzedSourceIdRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    visitSection("idea");
-  }, [visitSection]);
-
-  useEffect(() => {
-    if (!importedIdea) {
-      return;
-    }
-
-    if (
-      draft.sourceIdeaId === importedIdea.sourceIdeaId &&
-      draft.idea.trim() === importedIdea.idea.trim()
-    ) {
-      return;
-    }
-
-    importIdeaSource(importedIdea);
-  }, [draft.idea, draft.sourceIdeaId, importIdeaSource, importedIdea]);
-
-  useEffect(() => {
-    if (!autoAnalyze || !importedIdea) {
-      return;
-    }
-
-    const ready =
-      draft.sourceIdeaId === importedIdea.sourceIdeaId &&
-      draft.idea.trim() === importedIdea.idea.trim();
-
-    if (!ready || draft.analysis) {
-      return;
-    }
-
-    if (autoAnalyzedSourceIdRef.current === importedIdea.sourceIdeaId) {
-      return;
-    }
-
-    autoAnalyzedSourceIdRef.current = importedIdea.sourceIdeaId;
-    analyzeIdea("idea");
-  }, [analyzeIdea, autoAnalyze, draft.analysis, draft.idea, draft.sourceIdeaId, importedIdea]);
-
-  return (
-    <HelperShell>
-      <HelperHeader
-        title="아이디어 선택"
-        description="입력한 내용을 바탕으로 시작 형태를 정하고, 다음 단계로 바로 넘길 수 있습니다."
-        action={
-          <Button asChild size="sm" variant="outline">
-            <Link href="/ideas">게시판에서 가져오기</Link>
-          </Button>
-        }
-      />
-
-      <HorizontalStageNav current="idea" />
-
-      <section className="grid gap-4 xl:grid-cols-[1.18fr_0.82fr]">
-        <SectionCard
-          title="아이디어 입력"
-          description="무엇을 만들지, 어떤 결과가 나오면 좋은지 짧게 적어 주세요."
-        >
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="helper-project-name" className="text-[12px] font-semibold text-foreground">
-                프로젝트 이름
-              </label>
-              <Input
-                id="helper-project-name"
-                value={draft.projectName}
-                onChange={(event) => setProjectName(event.target.value, "idea")}
-                placeholder="예: 사장님용 매장 소개 예약 서비스"
-                className="h-11"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="helper-idea" className="text-[12px] font-semibold text-foreground">
-                아이디어 설명
-              </label>
-              <Textarea
-                id="helper-idea"
-                className="min-h-40"
-                value={draft.idea}
-                onChange={(event) => setIdea(event.target.value, "idea")}
-                placeholder="누가 쓰는지, 어떤 문제를 해결하는지, 꼭 들어가야 하는 기능을 적어 주세요."
-              />
-            </div>
-
-            <div className="flex flex-wrap justify-end gap-2">
-              {draft.analysis ? (
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/helper/architecture">구조 단계로 이동</Link>
-                </Button>
-              ) : null}
-              <Button onClick={() => analyzeIdea("idea")} disabled={!draft.idea.trim()} size="sm">
-                <Wand2 className="size-4" />
-                {draft.analysis ? "다시 정리" : "내용 정리"}
-              </Button>
-            </div>
-          </div>
-        </SectionCard>
-
-        <div className="space-y-4">
-          <StatGrid
-            items={[
-              { label: "입력 방식", value: draft.sourceIdeaTitle ?? "직접 입력" },
-              { label: "분석 상태", value: draft.analysis ? "정리 완료" : "입력 대기" },
-              { label: "선택 형태", value: selectedServiceType?.name ?? "아직 선택 안 함" },
-            ]}
-          />
-
-          <SectionCard
-            title="시작 형태 선택"
-            description="한 번만 고르면 다음 단계 구조와 프롬프트가 여기에 맞춰 정리됩니다."
-          >
-            <div className="grid gap-3">
-              {(draft.analysis?.serviceTypes ?? []).map((serviceType) => {
-                const active = draft.selectedTypeId === serviceType.id;
-
-                return (
-                  <button
-                    key={serviceType.id}
-                    type="button"
-                    onClick={() => selectServiceType(serviceType.id, "idea")}
-                    className={cn(
-                      "rounded-[1.2rem] border px-4 py-4 text-left transition",
-                      active
-                        ? "border-primary/14 bg-primary text-white"
-                        : "border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)] hover:bg-white",
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-[14px] font-semibold">{serviceType.name}</p>
-                        <p className={cn("mt-1 text-[12px] leading-5", active ? "text-white/78" : "text-muted-foreground")}>
-                          {serviceType.summary}
-                        </p>
-                      </div>
-                      {active ? <BadgeCheck className="mt-0.5 size-4 shrink-0" /> : null}
-                    </div>
-                  </button>
-                );
-              })}
-              {!draft.analysis ? (
-                <div className="rounded-[1.2rem] border border-dashed border-[rgba(121,118,127,0.16)] px-4 py-4 text-[12px] text-muted-foreground">
-                  먼저 내용을 정리하면 시작 형태를 고를 수 있습니다.
-                </div>
-              ) : null}
-            </div>
-          </SectionCard>
-        </div>
-      </section>
-
-      <SectionCard
-        title="입력 요약"
-        description="다음 결정을 빠르게 하기 위한 정리본입니다."
-      >
-        {draft.analysis ? (
-          <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="rounded-[1.2rem] bg-[rgba(248,247,248,0.92)] px-4 py-4">
-              <p className="text-[12px] font-semibold text-primary">핵심 요구</p>
-              <ul className="mt-3 space-y-2 text-[13px] leading-6 text-muted-foreground">
-                {draft.analysis.keyNeeds.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <Check className="mt-1 size-3.5 shrink-0 text-secondary" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <div className="rounded-[1.2rem] bg-[rgba(248,247,248,0.92)] px-4 py-4">
-                <p className="text-[12px] font-semibold text-primary">다음에 정할 것</p>
-                <ul className="mt-3 space-y-2 text-[13px] leading-6 text-muted-foreground">
-                  {draft.analysis.nextQuestions.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <ChevronRight className="mt-1 size-3.5 shrink-0 text-primary/60" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {selectedServiceType ? (
-                <div className="rounded-[1.2rem] border border-[rgba(121,118,127,0.08)] bg-white px-4 py-4">
-                  <p className="text-[12px] font-semibold text-primary">현재 선택</p>
-                  <p className="mt-2 text-[14px] font-semibold text-primary">{selectedServiceType.name}</p>
-                  <p className="mt-1 text-[12px] leading-5 text-muted-foreground">{selectedServiceType.fitReason}</p>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-[1.2rem] border border-dashed border-[rgba(121,118,127,0.16)] px-4 py-6 text-[12px] text-muted-foreground">
-            내용을 정리하면 핵심 요구와 다음에 정할 항목이 여기에 보입니다.
-          </div>
-        )}
-      </SectionCard>
-    </HelperShell>
-  );
-}
-
 export function ArchitectureWorkspaceScreen() {
   const { completion, draft, selectedServiceType, updateOptions, visitSection } = useWorkspace();
 
@@ -610,14 +543,15 @@ export function ArchitectureWorkspaceScreen() {
     return (
       <HelperShell>
         <HelperHeader
-          title="구조 선택"
-          description="먼저 아이디어와 시작 형태를 정하면 구조를 잡을 수 있습니다."
+          title="아키텍처"
+          description="아이디어/서비스 유형 선택 후 아키텍처를 결정합니다."
+          fixedGuide="아키텍처는 아이디어 단계 결과를 기반으로 생성됩니다."
         />
         <HorizontalStageNav current="architecture" />
         <WorkspaceEmptyState
-          eyebrow="구조"
-          title="먼저 아이디어를 정리해 주세요"
-          description="아이디어가 정리되면 예산, 디자인, 작업 환경을 기준으로 구조를 바로 만들 수 있습니다."
+          eyebrow="아키텍처"
+          title="아이디어 단계를 먼저 완료하세요"
+          description="아이디어 분석과 서비스 유형 선택 후 아키텍처를 진행할 수 있습니다."
           actionHref="/helper/idea"
           actionLabel="아이디어 단계로 이동"
         />
@@ -628,93 +562,38 @@ export function ArchitectureWorkspaceScreen() {
   return (
     <HelperShell>
       <HelperHeader
-        title="구조 선택"
-        description="예산과 작업 환경을 고르면 사용할 기술과 구조 초안이 바로 정리됩니다."
+        title="아키텍처 선택"
+        description="예산, 디자인, 환경을 조정하면 블루프린트가 재생성됩니다."
+        fixedGuide="이 단계 변경 사항은 아키텍처와 프롬프트 전체에 반영됩니다."
       />
-
       <HorizontalStageNav current="architecture" />
 
       <section className="grid gap-4 xl:grid-cols-3">
-        <OptionCard
-          title="예산"
-          options={budgetOptions}
-          value={draft.options.budget}
-          onChange={(value) =>
-            updateOptions({ budget: value as ArchitectureOptions["budget"] }, "architecture")
-          }
-        />
-        <OptionCard
-          title="디자인"
-          options={designOptions}
-          value={draft.options.design}
-          onChange={(value) =>
-            updateOptions({ design: value as ArchitectureOptions["design"] }, "architecture")
-          }
-        />
-        <OptionCard
-          title="작업 환경"
-          options={environmentOptions}
-          value={draft.options.environment}
-          onChange={(value) =>
-            updateOptions(
-              { environment: value as ArchitectureOptions["environment"] },
-              "architecture",
-            )
-          }
-        />
+        <OptionCard title="예산" options={budgetOptions} value={draft.options.budget} onChange={(v) => updateOptions({ budget: v as ArchitectureOptions["budget"] }, "architecture")} />
+        <OptionCard title="디자인" options={designOptions} value={draft.options.design} onChange={(v) => updateOptions({ design: v as ArchitectureOptions["design"] }, "architecture")} />
+        <OptionCard title="작업 환경" options={environmentOptions} value={draft.options.environment} onChange={(v) => updateOptions({ environment: v as ArchitectureOptions["environment"] }, "architecture")} />
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <SectionCard
-          title={draft.architecture?.title ?? "구조 초안"}
-          description={draft.architecture?.summary ?? "구조 초안이 여기에 보입니다."}
-        >
-          {draft.architecture ? (
-            <div className="space-y-4">
-              <div className="rounded-[1.4rem] border border-[rgba(121,118,127,0.08)] bg-[linear-gradient(180deg,#ffffff_0%,#f7f6f8_100%)] p-4">
-                <MermaidDiagram chart={draft.architecture.mermaid} />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {draft.architecture.highlights.map((item) => (
-                  <span
-                    key={item.label}
-                    className="rounded-full bg-[rgba(248,247,248,0.92)] px-3 py-1 text-[12px] text-muted-foreground"
-                  >
-                    {item.label} · {item.value}
-                  </span>
-                ))}
-              </div>
+      <SectionCard title={draft.architecture?.title ?? "아키텍처 블루프린트"} description={draft.architecture?.summary ?? "서비스 유형/옵션 선택 후 블루프린트가 표시됩니다."}>
+        {draft.architecture ? (
+          <div className="space-y-4">
+            <div className="rounded-[1.4rem] border border-[rgba(121,118,127,0.08)] bg-[linear-gradient(180deg,#ffffff_0%,#f7f6f8_100%)] p-4">
+              <MermaidDiagram chart={draft.architecture.mermaid} />
             </div>
-          ) : null}
-        </SectionCard>
-
-        <div className="space-y-4">
-          <StatGrid
-            items={[
-              { label: "선택 형태", value: selectedServiceType.name },
-              {
-                label: "UI 방향",
-                value: draft.options.design === "custom" ? "브랜드형 UI" : "기본 UI",
-              },
-              {
-                label: "작업 환경",
-                value: draft.options.environment === "local" ? "로컬 작업" : "클라우드 작업",
-              },
-            ]}
-          />
-
-          <SectionCard
-            title="기술 구성"
-            description="이 구조에서 바로 쓰게 되는 언어, 프레임워크, SaaS 조합입니다."
-          >
-            <TechnologyCards options={draft.options} />
-          </SectionCard>
-        </div>
-      </section>
+            <div className="flex flex-wrap gap-2">
+              {draft.architecture.highlights.map((item) => (
+                <span key={item.label} className="rounded-full bg-[rgba(248,247,248,0.92)] px-3 py-1 text-[12px] text-muted-foreground">
+                  {item.label}: {item.value}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </SectionCard>
 
       <div className="flex justify-end">
         <Button asChild size="sm">
-          <Link href="/helper/skills">스킬 단계로 이동</Link>
+          <Link href="/helper/skills">도구 추천 단계로 이동</Link>
         </Button>
       </div>
     </HelperShell>
@@ -737,24 +616,19 @@ export function SkillsWorkspaceScreen() {
 
   useEffect(() => {
     let cancelled = false;
-
     async function loadItems() {
       try {
         setLoading(true);
         setError(null);
-
         const response = await fetch(
           `/api/explore?kind=skills&source=${source}&sort=${sort}&limit=24&q=${encodeURIComponent(
             deferredQuery,
           )}`,
         );
-
         if (!response.ok) {
           throw new Error("failed");
         }
-
         const payload = (await response.json()) as ExploreApiResponse;
-
         if (!cancelled) {
           setItems(payload.items);
         }
@@ -769,9 +643,7 @@ export function SkillsWorkspaceScreen() {
         }
       }
     }
-
     void loadItems();
-
     return () => {
       cancelled = true;
     };
@@ -781,16 +653,17 @@ export function SkillsWorkspaceScreen() {
     return (
       <HelperShell>
         <HelperHeader
-          title="스킬 추천과 선택"
-          description="먼저 구조를 정하면 그 구조에 맞는 스킬을 고를 수 있습니다."
+          title="도구 추천"
+          description="아키텍처 준비 후 사용할 스킬을 선택합니다."
+          fixedGuide="선택한 스킬은 Stage 1 설정 프롬프트에 자동 반영됩니다."
         />
         <HorizontalStageNav current="skills" />
         <WorkspaceEmptyState
-          eyebrow="스킬"
-          title="먼저 구조를 정리해 주세요"
-          description="구조가 정리되면 설치와 연결에 도움 되는 스킬을 고를 수 있습니다."
+          eyebrow="도구 추천"
+          title="아키텍처 단계를 먼저 완료하세요"
+          description="아키텍처 정보가 있어야 추천 정확도가 높아집니다."
           actionHref="/helper/architecture"
-          actionLabel="구조 단계로 이동"
+          actionLabel="아키텍처 단계로 이동"
         />
       </HelperShell>
     );
@@ -801,60 +674,43 @@ export function SkillsWorkspaceScreen() {
   return (
     <HelperShell>
       <HelperHeader
-        title="스킬 추천과 선택"
-        description="여기서 고른 스킬은 Stage 1 로컬 세팅 프롬프트에 자동으로 포함됩니다."
-        action={
-          <Button asChild size="sm" variant="outline">
-            <Link href="/knowledge/skills">전체 스킬 정보 보기</Link>
-          </Button>
-        }
+        title="도구 추천"
+        description="구현을 도와줄 스킬/도구를 선택하세요."
+        fixedGuide="이 단계 결과는 프롬프트 단계의 설치/설정 지시에 반영됩니다."
       />
-
       <HorizontalStageNav current="skills" />
 
-      <SectionCard title="찾기">
+      <SectionCard title="고정 추천 번들" description="Superpowers 및 상황별 보완 스킬 추천입니다.">
+        <div className="grid gap-3 md:grid-cols-2">
+          {fixedRecommendedSkills.map((skill) => (
+            <div key={skill.name} className="rounded-[1.2rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)] p-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-4 text-primary" />
+                <p className="text-[13px] font-semibold text-primary">{skill.name}</p>
+              </div>
+              <p className="mt-1 text-[12px] text-muted-foreground">{skill.reason}</p>
+              <p className="mt-2 text-[12px] text-muted-foreground">{skill.how}</p>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      <SectionCard title="스킬 탐색">
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:items-center">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="스킬 이름, 저장소, 키워드 검색"
-              className="h-11 pl-9"
-            />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="이름/저장소/태그로 검색" className="h-11 pl-9" />
           </div>
-
           <div className="flex flex-wrap gap-2">
             {skillSources.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setSource(item.id)}
-                className={cn(
-                  "rounded-full px-3 py-2 text-[12px] font-medium transition",
-                  source === item.id
-                    ? "bg-primary text-white"
-                    : "bg-[rgba(248,247,248,0.92)] text-muted-foreground hover:bg-white",
-                )}
-              >
+              <button key={item.id} type="button" onClick={() => setSource(item.id)} className={cn("rounded-full px-3 py-2 text-[12px] font-medium transition", source === item.id ? "bg-primary text-white" : "bg-[rgba(248,247,248,0.92)] text-muted-foreground hover:bg-white")}>
                 {item.label}
               </button>
             ))}
           </div>
-
           <div className="flex flex-wrap gap-2">
             {skillSorts.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setSort(item.id)}
-                className={cn(
-                  "rounded-full px-3 py-2 text-[12px] font-medium transition",
-                  sort === item.id
-                    ? "bg-secondary text-white"
-                    : "bg-[rgba(248,247,248,0.92)] text-muted-foreground hover:bg-white",
-                )}
-              >
+              <button key={item.id} type="button" onClick={() => setSort(item.id)} className={cn("rounded-full px-3 py-2 text-[12px] font-medium transition", sort === item.id ? "bg-secondary text-white" : "bg-[rgba(248,247,248,0.92)] text-muted-foreground hover:bg-white")}>
                 {item.label}
               </button>
             ))}
@@ -863,69 +719,31 @@ export function SkillsWorkspaceScreen() {
       </SectionCard>
 
       <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-        <SectionCard
-          title="추천 스킬"
-          description="현재 아이디어와 구조를 기준으로 먼저 보면 좋은 스킬입니다."
-        >
+        <SectionCard title="추천 스킬">
           {loading ? (
             <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
               <LoaderCircle className="size-4 animate-spin" />
-              스킬을 불러오는 중입니다.
+              스킬 목록 불러오는 중...
             </div>
           ) : error ? (
-            <div className="rounded-[1.2rem] border border-dashed border-[rgba(121,118,127,0.16)] px-4 py-5 text-[12px] text-muted-foreground">
-              {error}
-            </div>
+            <p className="text-[12px] text-muted-foreground">{error}</p>
           ) : visibleItems.length === 0 ? (
-            <div className="rounded-[1.2rem] border border-dashed border-[rgba(121,118,127,0.16)] px-4 py-5 text-[12px] text-muted-foreground">
-              조건에 맞는 스킬이 없습니다.
-            </div>
+            <p className="text-[12px] text-muted-foreground">검색 결과가 없습니다.</p>
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
               {visibleItems.slice(0, 8).map((item) => {
-                const selected = draft.selectedSkills.some((skill) => skill.id === item.id);
-
+                const selected = isSkillSelected(draft.selectedSkills, item);
                 return (
-                  <article
-                    key={item.id}
-                    className={cn(
-                      "rounded-[1.2rem] border px-4 py-4 transition",
-                      selected
-                        ? "border-primary/14 bg-primary text-white"
-                        : "border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)]",
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap gap-2 text-[11px]">
-                          <span className={cn("rounded-full px-2.5 py-1 font-semibold", selected ? "bg-white/10 text-white/82" : "bg-white text-muted-foreground")}>
-                            {item.sourceLabel}
-                          </span>
-                          <span className={selected ? "text-white/68" : "text-muted-foreground"}>
-                            {item.popularityLabel}
-                          </span>
-                        </div>
-                        <p className="mt-3 text-[14px] font-semibold">{item.title}</p>
-                        <p className={cn("mt-1 text-[12px] leading-5", selected ? "text-white/76" : "text-muted-foreground")}>
-                          {item.summary}
-                        </p>
-                      </div>
-                      {selected ? <BadgeCheck className="mt-0.5 size-4 shrink-0" /> : null}
-                    </div>
-
+                  <article key={item.id} className={cn("rounded-[1.2rem] border px-4 py-4 transition", selected ? "border-primary/14 bg-primary text-white" : "border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)]")}>
+                    <p className="text-[14px] font-semibold">{item.title}</p>
+                    <p className={cn("mt-1 text-[12px] leading-5", selected ? "text-white/76" : "text-muted-foreground")}>{item.summary}</p>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={selected ? "outline" : "secondary"}
-                        className={selected ? "border-white/18 bg-white/10 text-white hover:bg-white/16" : ""}
-                        onClick={() => toggleSkill(buildSelectedSkill(item), "skills")}
-                      >
-                        {selected ? "선택 해제" : "선택"}
+                      <Button type="button" size="sm" variant={selected ? "outline" : "secondary"} className={selected ? "border-white/18 bg-white/10 text-white hover:bg-white/16" : ""} onClick={() => toggleSkill(buildSelectedSkill(item), "skills")}>
+                        {selected ? "제거" : "선택"}
                       </Button>
                       <Button asChild size="sm" variant={selected ? "ghost" : "outline"}>
                         <a href={item.url} target="_blank" rel="noreferrer">
-                          원본
+                          원문
                           <ExternalLink className="size-3.5" />
                         </a>
                       </Button>
@@ -937,50 +755,29 @@ export function SkillsWorkspaceScreen() {
           )}
         </SectionCard>
 
-        <div className="space-y-4">
-          <SectionCard
-            title={`선택한 스킬 ${draft.selectedSkills.length}개`}
-            description="선택하지 않아도 다음 단계로 갈 수 있지만, 고른 스킬은 Stage 1에 반영됩니다."
-          >
-            {draft.selectedSkills.length > 0 ? (
-              <div className="space-y-3">
-                {draft.selectedSkills.map((skill) => (
-                  <div
-                    key={skill.id}
-                    className="rounded-[1.1rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)] px-4 py-4"
-                  >
-                    <p className="text-[13px] font-semibold text-primary">{skill.title}</p>
-                    <p className="mt-1 text-[12px] leading-5 text-muted-foreground">{skill.summary}</p>
-                    {skill.installCommand ? (
-                      <p className="mt-2 rounded-lg bg-white px-3 py-2 font-mono text-[11px] text-primary">
-                        {skill.installCommand}
-                      </p>
-                    ) : null}
-                  </div>
-                ))}
-
-                <Button type="button" variant="ghost" size="sm" onClick={() => clearSkills("skills")}>
-                  선택 비우기
-                </Button>
-              </div>
-            ) : (
-              <div className="rounded-[1.2rem] border border-dashed border-[rgba(121,118,127,0.16)] px-4 py-5 text-[12px] text-muted-foreground">
-                아직 선택한 스킬이 없습니다.
-              </div>
-            )}
-          </SectionCard>
-
-          <SectionCard
-            title="이 단계에서 하는 일"
-            description="설치할 스킬만 정하고, 실제 설치 순서는 Stage 1 프롬프트에서 안내받습니다."
-          >
-            <div className="space-y-2 text-[12px] leading-6 text-muted-foreground">
-              <p>1. 필요한 스킬만 선택합니다.</p>
-              <p>2. Stage 1 프롬프트에서 설치 순서와 연결 방법을 받습니다.</p>
-              <p>3. 구현 프롬프트는 다음 단계에서 이어갑니다.</p>
+        <SectionCard title={`선택됨 (${draft.selectedSkills.length})`}>
+          {draft.selectedSkills.length > 0 ? (
+            <div className="space-y-3">
+              {draft.selectedSkills.map((skill) => (
+                <div key={skill.id} className="rounded-[1.1rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(248,247,248,0.92)] px-4 py-4">
+                  <p className="text-[13px] font-semibold text-primary">{skill.title}</p>
+                  <p className="mt-1 text-[12px] leading-5 text-muted-foreground">{skill.summary}</p>
+                  {skill.installCommand ? (
+                    <p className="mt-2 rounded-lg bg-white px-3 py-2 font-mono text-[11px] text-primary">{skill.installCommand}</p>
+                  ) : null}
+                </div>
+              ))}
+              <Button type="button" variant="ghost" size="sm" onClick={() => clearSkills("skills")}>
+                선택 비우기
+              </Button>
             </div>
+          ) : (
+            <p className="text-[12px] text-muted-foreground">아직 선택된 스킬이 없습니다.</p>
+          )}
+          <SectionCard title="고급 자동화 안내" className="mt-4">
+            <p className="text-[12px] text-muted-foreground">`subagent-driven-development`, `dispatching-parallel-agents` 같은 실행 자동화는 v1에서는 고급 영역으로 분리해 두었습니다.</p>
           </SectionCard>
-        </div>
+        </SectionCard>
       </section>
 
       <div className="flex justify-end">
@@ -1012,16 +809,17 @@ export function PromptsWorkspaceScreen() {
     return (
       <HelperShell>
         <HelperHeader
-          title="프롬프트"
-          description="앞단계가 정리되면 바로 복사해서 쓸 프롬프트가 만들어집니다."
+          title="실행 프롬프트"
+          description="아키텍처 준비 후 단계별 프롬프트가 생성됩니다."
+          fixedGuide="프롬프트는 planning + idea + architecture 결과를 합쳐 재생성됩니다."
         />
         <HorizontalStageNav current="prompts" />
         <WorkspaceEmptyState
           eyebrow="프롬프트"
-          title="먼저 구조를 정리해 주세요"
-          description="아이디어와 구조가 정리되면 단계별 프롬프트가 자동으로 준비됩니다."
+          title="아키텍처 단계를 먼저 완료하세요"
+          description="프롬프트 단계에는 아키텍처 블루프린트가 필요합니다."
           actionHref="/helper/architecture"
-          actionLabel="구조 단계로 이동"
+          actionLabel="아키텍처 단계로 이동"
         />
       </HelperShell>
     );
@@ -1035,70 +833,29 @@ export function PromptsWorkspaceScreen() {
   return (
     <HelperShell>
       <HelperHeader
-        title="프롬프트"
-        description="상단에서 단계만 고르면, 아래에서 바로 복사해서 사용할 수 있습니다."
+        title="실행 프롬프트"
+        description="설정부터 배포까지 순서대로 실행하세요."
+        fixedGuide="권장 순서: brainstorming -> writing-plans -> Vibe Helper Stage 1~4"
       />
+      <HorizontalStageNav current="prompts" />
 
-      <section className="space-y-3">
-        <div className="flex items-start gap-3 rounded-[1.4rem] border border-[rgba(121,118,127,0.08)] bg-[rgba(255,255,255,0.78)] px-4 py-4">
-          <div className="flex size-10 items-center justify-center rounded-full bg-[rgba(59,53,97,0.08)] text-primary">
-            <LayoutTemplate className="size-4" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-primary/56">
-              Vibe Helper 순서
-            </p>
-            <p className="text-[14px] font-semibold text-primary">
-              위 영역은 헬퍼 전체 진행 단계입니다.
-            </p>
-            <p className="text-[12px] leading-6 text-muted-foreground">
-              아이디어, 구조, 스킬, 프롬프트 중 현재 어디에 있는지 보여 주는 내비게이션입니다.
-            </p>
-          </div>
+      <SectionCard title="프롬프트 단계">
+        <div className="flex flex-wrap gap-2">
+          {draft.promptStages.map((stage) => (
+            <Button key={stage.stage} type="button" size="sm" variant={stage.stage === draft.activePromptStage ? "default" : "outline"} onClick={() => setPromptStage(stage.stage, "prompts")}>
+              단계 {stage.stage}
+            </Button>
+          ))}
         </div>
-        <HorizontalStageNav current="prompts" />
-      </section>
-
-      <section className="space-y-4 rounded-[1.8rem] border border-[rgba(91,95,151,0.14)] bg-[linear-gradient(180deg,rgba(244,244,252,0.96),rgba(255,255,255,0.98))] px-5 py-5 shadow-[0_12px_24px_rgba(37,31,74,0.04)]">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex items-start gap-3">
-            <div className="flex size-10 items-center justify-center rounded-full bg-primary text-white">
-              <Wand2 className="size-4" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-primary/56">
-                Prompt Order
-              </p>
-              <p className="text-[15px] font-semibold text-primary">
-                아래 Stage는 실제 실행 프롬프트 순서입니다.
-              </p>
-              <p className="text-[12px] leading-6 text-muted-foreground">
-                위의 헬퍼 단계와는 다른 개념이며, 여기서는 Stage 1부터 4까지 순서대로 복사해 실행하면 됩니다.
-              </p>
-            </div>
-          </div>
-          <div className="rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-primary shadow-[0_8px_18px_rgba(37,31,74,0.06)]">
-            현재 선택: Stage {draft.activePromptStage}
-          </div>
-        </div>
-
-        <StageSelector
-          stages={draft.promptStages}
-          activeStage={draft.activePromptStage}
-          onSelect={(stage) => setPromptStage(stage, "prompts")}
-        />
-      </section>
+      </SectionCard>
 
       {activePrompt ? <PromptCard stage={activePrompt} showObjective={false} /> : null}
-
       {activePrompt ? (
-        <SectionCard title="체크 포인트">
+      <SectionCard title="체크리스트">
           <div className="flex flex-wrap gap-2">
             {activePrompt.checklist.map((item) => (
-              <span
-                key={item}
-                className="rounded-full bg-[rgba(248,247,248,0.92)] px-3 py-1 text-[12px] text-muted-foreground"
-              >
+              <span key={item} className="rounded-full bg-[rgba(248,247,248,0.92)] px-3 py-1 text-[12px] text-muted-foreground">
+                <Check className="mr-1 inline size-3" />
                 {item}
               </span>
             ))}
@@ -1106,27 +863,20 @@ export function PromptsWorkspaceScreen() {
         </SectionCard>
       ) : null}
 
-      <SectionCard
-        title="저장"
-        description="현재 아이디어, 구조, 프롬프트를 프로젝트로 저장해 둘 수 있습니다."
-      >
+      <SectionCard title="프로젝트 저장">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="text-[12px] text-muted-foreground">현재 단계 결과를 프로젝트로 저장해 둘 수 있습니다.</div>
+          <div className="text-[12px] text-muted-foreground">현재 드래프트를 프로젝트 스냅샷으로 저장합니다.</div>
           <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={() => void saveProject()}
-              disabled={!isReadyToSave || isSavingProject}
-              size="sm"
-            >
+            <Button onClick={() => void saveProject()} disabled={!isReadyToSave || isSavingProject} size="sm">
               {isSavingProject ? "저장 중..." : "프로젝트 저장"}
             </Button>
             {savedProjectId ? (
               <>
                 <Button asChild variant="outline" size="sm">
-                  <Link href={`/helper/projects/${savedProjectId}`}>저장된 프로젝트 보기</Link>
+                  <Link href={`/helper/projects/${savedProjectId}`}>프로젝트 열기</Link>
                 </Button>
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/helper/projects/saved">내 프로젝트 목록</Link>
+                  <Link href="/helper/projects/saved">저장된 프로젝트</Link>
                 </Button>
               </>
             ) : null}
